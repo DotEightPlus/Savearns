@@ -11,13 +11,13 @@
     }
   ],
   "start_url": "./?v3&utm_source=web_app_manifest",
-  "background_color": "#fff",
-  "theme_color": "#fbb731",
-  "color": "#fbb731",
+  "background_color": "#34459C",
+  "theme_color": "#34459C",
+  "color": "#fff",
   "display": "minimal-ui",
   "related_applications": [{
     "platform": "web",
     "orientation": "portrait",
-    "url": "https://dotacademy.com.ng"
+    "url": "https://savearns.netlify.app"
   }]
 }
