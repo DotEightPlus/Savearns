@@ -1,0 +1,23 @@
+{
+  "short_name": "Savearns",
+  "name": "Savearns",
+  "description": "Save More While You Spend",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "assets/pwa.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    }
+  ],
+  "start_url": "./?v3&utm_source=web_app_manifest",
+  "background_color": "#fff",
+  "theme_color": "#fbb731",
+  "color": "#fbb731",
+  "display": "minimal-ui",
+  "related_applications": [{
+    "platform": "web",
+    "orientation": "portrait",
+    "url": "https://dotacademy.com.ng"
+  }]
+}
