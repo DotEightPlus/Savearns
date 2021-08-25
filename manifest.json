@@ -18,6 +18,6 @@
   "related_applications": [{
     "platform": "web",
     "orientation": "portrait",
-    "url": "https://savearns.com"
+    "url": "https://savearns.netlify.app"
   }]
 }
