@@ -42,6 +42,13 @@ function token_generator() {
 	return $token; 
 }
 
+function otp() {
+
+	$otp = $_SESSION['otp'] = mt_rand(0, 99999);
+
+	return $otp; 
+}
+
 function validation_errors($error_message) {
 
 $error_message = <<<DELIMITER
@@ -152,7 +159,7 @@ function register($fname, $tel, $email, $uname, $pword, $ref) {
 
 	$datereg = date("Y-m-d");
 
-	$activator = token_generator();
+	$activator = otp();
 	
 $sql = "INSERT INTO users(`sn`, `fname`, `usname`, `email`, `pword`, `datereg`, `active`, `tel`, `activator`, `ref`)";
 $sql.= " VALUES('1', '$fnam', '$unam', '$emai', '$pwor', '$datereg', '0', '$tel', '$activator', '$ref')";
@@ -160,21 +167,20 @@ $result = query($sql);
 
 //redirect to verify function
 $subj = "VERIFY YOUR EMAIL";
-$link = "https://dashboard.savearns.com/./activate?vef=".$activator;
 
 $_SESSION['usemail'] = $email;
 
-mail_mailer($email, $activator, $subj, $link);
+mail_mailer($email, $activator, $subj);
 
-//redirect to verify page
+//open otp page
 echo 'Loading...Please Wait!';
-echo '<script>window.location.href ="./verify"</script>';
+echo'<script>otpVerify();</script>';
 	 }
 
 
 
 /* MAIL VERIFICATIONS */
-function mail_mailer($email, $activator, $subj, $link) {
+function mail_mailer($email, $activator, $subj) {
 
 $to 		= $email;
 $from 		= "noreply@savearns.com";
