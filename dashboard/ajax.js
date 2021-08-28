@@ -116,28 +116,27 @@ $("#vsub").click(function () {
 
 
   //signin
-  $("#signin").click(function () {
-    var username = $("#lgusr").val();
-    var password = $("#lgpword").val();
+  $("#lsub").click(function () {
+    var username = $("#luname").val();
+    var password = $("#lpword").val();
 
     if (username == "" || username == null) {
-      $("#msg").html("Please insert your username");
+      $("#lmsg").html("Kindly insert your username");
     } else {
       if (password == "" || password == null) {
-        $("#msg").html("Your password is empty");
+        $("#lmsg").html("Invalid password inputted");
       } else {
+        $("#lmsg").html("Loading... Please wait");
         $.ajax({
           type: "post",
           url: "functions/init.php",
           data: { username: username, password: password },
           success: function (data) {
-            $("#msg").html(data);
+            $("#lmsg").html(data);
           },
         });
       }
     }
-
-    $("#exampleModalCenter").modal();
   });
 
   //forgot

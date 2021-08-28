@@ -18,7 +18,7 @@ if(isset($_SESSION['login'])) {
     <meta property="og:image" content="assets/img/1.png" />
     <meta property="og:url" content="https://dashboard.savearns.com/signup" />
     <meta property="og:site_name" content="Savearns | SignUp" />
-    <meta property="og:description" content="Save More While You SpendSavearns - Create a free account" />
+    <meta property="og:description" content="Savearns - Create a free account" />
     <meta charset="UTF-8">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1">

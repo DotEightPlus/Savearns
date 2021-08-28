@@ -8,17 +8,17 @@ if(isset($_SESSION['login'])) {
 <html lang="en">
 
 <head>
-    <title>Savearns | SignUp</title>
+    <title>Savearns | Sign In</title>
 
 
     <!-- OG Meta Tags to improve the way the post looks when you share the page on Facebook, Twitter, LinkedIn -->
-    <meta name="description" content="Savearns - Create a free account">
-    <meta name="keywords" content="Savearns | SignUp">
-    <meta property="og:title" content="Savearns | SignUp" />
+    <meta name="description" content="Savearns - Welcome Back">
+    <meta name="keywords" content="Savearns | Sign In">
+    <meta property="og:title" content="Savearns | Sign In" />
     <meta property="og:image" content="assets/img/1.png" />
-    <meta property="og:url" content="https://dashboard.savearns.com/signup" />
-    <meta property="og:site_name" content="Savearns | SignUp" />
-    <meta property="og:description" content="Save More While You SpendSavearns - Create a free account" />
+    <meta property="og:url" content="https://dashboard.savearns.com/signin" />
+    <meta property="og:site_name" content="Savearns | Sign In" />
+    <meta property="og:description" content="Savearns - Welcome Back" />
     <meta charset="UTF-8">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,19 +78,19 @@ if(isset($_SESSION['login'])) {
                                 <div class="row">
                                     <div class="mb-3 col-lg-6">
                                         <label>Username</label>
-                                        <input type="text" id="uname" class="form-control" placeholder="Input Username"
-                                            onfocus="pwrr()">
+                                        <input type="text" id="luname" class="form-control" placeholder="Input Username"
+                                            onfocus="usr()">
                                     </div>
                                     <div class="mb-3 col-lg-6">
                                         <label>Password</label>
                                         <input type="password" id="lpword" class="form-control"
-                                            placeholder="Input your Password" onfocus="cprr()">
+                                            placeholder="Input your Password" onfocus="prr()">
                                     </div>
                                 </div>
 
                                 <div class="text-center">
-                                    <p class="text-danger" id="msg"></p>
-                                    <button type="button" id="sub" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign
+                                    <p class="text-danger" id="lmsg"></p>
+                                    <button type="button" id="lsub" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign
                                         In</button>
                                 </div>
                                 <h5 class="text-sm mt-3 mb-0 text-center"><a href="./forgot"
@@ -161,27 +161,11 @@ if(isset($_SESSION['login'])) {
     }
 
     //erase validations
-    function fmsgrr() {
+    function usr() {
         document.getElementById("msg").innerHTML = '';
     }
 
-    function telrr() {
-        document.getElementById("msg").innerHTML = '';
-    }
-
-    function emrr() {
-        document.getElementById("msg").innerHTML = '';
-    }
-
-    function usrr() {
-        document.getElementById("msg").innerHTML = '';
-    }
-
-    function pwrr() {
-        document.getElementById("msg").innerHTML = '';
-    }
-
-    function cprr() {
+    function prr() {
         document.getElementById("msg").innerHTML = '';
     }
 
