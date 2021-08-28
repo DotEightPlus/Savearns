@@ -308,32 +308,26 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 				$user 		= $row['usname'];
 				$active 	= $row['active'];
 				$email 		= $row['email'];
-				$activator 	= $row['activator'];
+				$activate 	= $row['activator'];
 
-				if ($active == 0 || $activator != '') {
+				if ($active == 0 || $activate != '') {
 
-					$newotp = otp();
+					$activator = otp();
 
 					$_SESSION['usemail'] = $email;
+
+					//update activation link
+					$ups = "UPDATE users SET `activator` = '$activate' WHERE `usname` = '$username'";
+					$ues = query($ups);
+
+					$subj = "VERIFY YOUR EMAIL";
 
 					mail_mailer($email, $activator, $subj);
 
 					//open otp page
 					echo 'Loading...Please Wait!';
 					echo '<script>otpVerify(); signupClose();</script>';
-
-					//update activation link
-					$ups = "UPDATE users SET `activator` = '$newotp' WHERE `usname` = '$username'";
-					$ues = query($ups);
-
-					//redirect to verify function
-					$subj    = "VERIFY YOUR EMAIL";
-					$link 	 = "https://dotpedia.com.ng/./activate?vef=".$activator;
-
-					mail_mailer($email, $activator, $subj, $link);
-
-					//redirect to verify page
-					echo '<script>window.location.href ="./verify"</script>';	
+	
 					
 				}  else {
 
@@ -343,7 +337,7 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 
 						echo 'Loading...Please Wait';	
 
-						echo '<script>window.location.href ="./pdf"</script>';	
+						echo '<script>window.location.href ="./"</script>';	
 					} else {
 
 						echo "This username doesn't have an account.";
@@ -354,7 +348,7 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 		}else {
 
 		         echo 'Loading...Please Wait!';
-                         echo '<script>window.location.href ="./forgot"</script>';;
+                 echo '<script>window.location.href ="./forgot"</script>';
 		}
 	}
 

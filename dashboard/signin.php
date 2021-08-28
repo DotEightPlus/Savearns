@@ -120,7 +120,7 @@ if(isset($_SESSION['login'])) {
                                         placeholder="Input one time password" aria-label="Name"
                                         aria-describedby="otp-addon" onclick="otpr()">
 
-                                    <input type="text" id="otpmail" class="form-control"
+                                    <input type="email" id="otpmail" class="form-control"
                                         value="<?php echo $_SESSION['usemail'] ?>" hidden>
                                 </div>
 
@@ -162,11 +162,11 @@ if(isset($_SESSION['login'])) {
 
     //erase validations
     function usr() {
-        document.getElementById("msg").innerHTML = '';
+        document.getElementById("lmsg").innerHTML = '';
     }
 
     function prr() {
-        document.getElementById("msg").innerHTML = '';
+        document.getElementById("lmsg").innerHTML = '';
     }
 
     function otpr() {

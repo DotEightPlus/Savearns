@@ -95,7 +95,7 @@ $("#vsub").click(function () {
   document.getElementById("rvmsg").style.display = 'none';
   document.getElementById("vmsg").style.display = 'block';
 
-  if (email == "" || email == null) {
+  if (vemail == "" || vemail == null) {
     $("#vmsg").html("Server Error!");
   } else {
     if (votp == "" || votp == null) {
