@@ -15,7 +15,7 @@ if(isset($_SESSION['login'])) {
     <meta name="description" content="Savearns - Create a free account">
     <meta name="keywords" content="Savearns | SignUp">
     <meta property="og:title" content="Savearns | SignUp" />
-    <meta property="og:image" content="assets/img/log.png" />
+    <meta property="og:image" content="assets/img/1.png" />
     <meta property="og:url" content="https://dashboard.savearns.com/signup" />
     <meta property="og:site_name" content="Savearns | SignUp" />
     <meta property="og:description" content="Save More While You SpendSavearns - Create a free account" />
@@ -156,7 +156,7 @@ if(isset($_SESSION['login'])) {
                                     <label>Input OTP</label>
                                     <input type="number" id="otpper" class="form-control"
                                         placeholder="Input one time password" aria-label="Name"
-                                        aria-describedby="otp-addon" onfocus="otpr()">
+                                        aria-describedby="otp-addon" onclick="otpr()">
 
                                     <input type="text" id="otpmail" class="form-control"
                                         value="<?php echo $_SESSION['usemail'] ?>" hidden>
@@ -165,6 +165,7 @@ if(isset($_SESSION['login'])) {
 
                                 <div class="text-center">
                                     <p class="text-danger" id="vmsg"></p>
+                                    <p class="text-danger" id="rvmsg"></p>
                                     <button type="button" id="vsub" class="btn bg-gradient-dark w-100 my-4 mb-2">Verify
                                         Account</button>
                                     <p style="cursor: pointer"

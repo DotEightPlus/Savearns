@@ -52,6 +52,6 @@ $body = "
     $body .= "</body>
 
 </html>";
-echo $_SESSION['otp'];
+echo $body;
 
 ?>

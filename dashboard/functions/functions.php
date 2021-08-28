@@ -247,6 +247,7 @@ if(isset($_POST['email']) && isset($_POST['otpp'])) {
 	$subj = "VERIFY YOUR EMAIL";	
 
 	mail_mailer($email, $activator, $subj);
+	echo "New OTP Code sent to your email";
 }
 
 
@@ -254,7 +255,7 @@ if(isset($_POST['email']) && isset($_POST['otpp'])) {
 if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 
 	$email = clean(escape($_POST['vemail']));
-	$veotp = clean(escape($_POST['veotp']));
+	$veotp = clean(escape($_POST['votp']));
 
 	$otp   = $_SESSION['otp'];
 
@@ -275,7 +276,7 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 	if(row_count($rsl) == '') {
 		
 		echo 'Loading...Please Wait';
-		echo '<script>window.location.href ="./signin"</script>';
+		//echo '<script>window.location.href ="./signin"</script>';
 		
 	} else {
 
@@ -283,7 +284,7 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 		$user = $_SESSION['usname'] = $row['usname'];
 		
 		echo 'Loading...Please Wait';
-		echo '<script>window.location.href ="./signup"</script>';
+		//echo '<script>window.location.href ="./signup"</script>';
 	}
 	}
 
@@ -811,5 +812,4 @@ function earning() {
 	$a = $rtw['earning'] + $rww['pqearning'] + $refff;
 	echo $a;
 }
-?>
 ?>

@@ -67,15 +67,15 @@ $("#rotp").click(function () {
   var otpp  = "1111";
 
   if (email == "" || email == null) {
-    $("#vmsg").html("Server Error!");
+    $("#rvmsg").html("Server Error!");
   } else {
-    $("#vmsg").html("New OTP Code sent to your email");
+    $("#rvmsg").html("Loading... Please wait");
     $.ajax({
       type: "post",
       url: "functions/init.php",
       data: {email:email, otpp: otpp},
       success: function (data) {
-        $("#vmsg").html(data);
+        $("#rvmsg").html(data);
       },
     });
   }
@@ -88,6 +88,8 @@ $("#vsub").click(function () {
 
   var vemail = $("#otpmail").val();
   var votp   = $("#otpper").val();
+
+  document.getElementById("rvmsg").style.display = 'none';
 
   if (email == "" || email == null) {
     $("#vmsg").html("Server Error!");
