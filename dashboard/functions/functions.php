@@ -79,7 +79,7 @@ DELIMITER;
 
 function email_exist($email) {
 
-	$sql = "SELECT * FROM signup WHERE `email` = '$email'";
+	$sql = "SELECT * FROM users WHERE `email` = '$email'";
 	$result = query($sql);
 
 	if(row_count($result) == 1) {
@@ -94,7 +94,7 @@ function email_exist($email) {
 
 function username_exist($usname) {
 
-	$sql = "SELECT * FROM signup WHERE `usname` = '$usname'";
+	$sql = "SELECT * FROM users WHERE `usname` = '$usname'";
 	$result = query($sql);
 
 	if(row_count($result) == 1) {
@@ -113,36 +113,28 @@ function username_exist($usname) {
 
 /** VALIDATE USER REGISTRATION **/
 
-if(isset($_POST['fname']) && isset($_POST['tel']) && isset($_POST['email']) && isset($_POST['pword']) && isset($_POST['cpword']) && isset($_POST['inst']) && isset($_POST['ref'])) {
+if(isset($_POST['fname']) && isset($_POST['tel']) && isset($_POST['email']) && isset($_POST['pword']) && isset($_POST['cpword']) && isset($_POST['ref'])) {
 
-$fname 			= clean($_POST['fname']);
-$tel	 		= clean($_POST['tel']);
-$email	 		= clean($_POST['email']);
-$uname	 		= clean($_POST['user']);
-$pword    		= clean($_POST['pword']);
-$cpword 		= clean($_POST['cpword']);
-$inst			= clean($_POST['inst']);
+$fname 			= clean(escape($_POST['fname']));
+$tel	 		= clean(escape($_POST['tel']));
+$email	 		= clean(escape($_POST['email']));
+$uname	 		= clean(escape($_POST['user']));
+$pword    		= clean(escape($_POST['pword']));
+$cpword 		= clean(escape($_POST['cpword']));
 $ref            = clean(escape($_POST['ref']));
 
 if(email_exist($email)) {
 
-			echo "Sorry! That email already has an account";
+			echo "Sorry! The email inputted already has an account";
 		} else {
 
 if(username_exist($uname)) {
 
-			echo "That username has been taken!";
+			echo "That username is unavailable!";
 		} else {
 
-
-if($pword != $cpword) {
-
-			echo "Password doesn`t match!";
-			
-		} else {
-			register($fname, $tel, $email, $uname, $pword, $inst, $ref);
+			register($fname, $tel, $email, $uname, $pword, $ref);
 		}
-	}
 	}
 	} // post request
 
@@ -150,7 +142,7 @@ if($pword != $cpword) {
 	
 
 /** REGISTER USER **/
-function register($fname, $tel, $email, $uname, $pword, $inst, $ref) {
+function register($fname, $tel, $email, $uname, $pword, $ref) {
 
 	$fnam = escape($fname);
 	$emai = escape($email);
@@ -162,13 +154,13 @@ function register($fname, $tel, $email, $uname, $pword, $inst, $ref) {
 
 	$activator = token_generator();
 	
-$sql = "INSERT INTO signup(`id`, `fname`, `usname`, `email`, `pword`, `datereg`, `active`, `tel`, `inst`, `activator`, `vrf`, `ref`, `pvf`)";
-$sql.= " VALUES('1', '$fnam', '$unam', '$emai', '$pwor', '$datereg', '0', '$tel', '$inst', '$activator', 'No', '$ref', '0')";
+$sql = "INSERT INTO users(`sn`, `fname`, `usname`, `email`, `pword`, `datereg`, `active`, `tel`, `activator`, `ref`)";
+$sql.= " VALUES('1', '$fnam', '$unam', '$emai', '$pwor', '$datereg', '0', '$tel', '$activator', '$ref')";
 $result = query($sql);
 
 //redirect to verify function
 $subj = "VERIFY YOUR EMAIL";
-$link = "https://dotpedia.com.ng/./activate?vef=".$activator;
+$link = "https://dashboard.savearns.com/./activate?vef=".$activator;
 
 $_SESSION['usemail'] = $email;
 
@@ -185,7 +177,7 @@ echo '<script>window.location.href ="./verify"</script>';
 function mail_mailer($email, $activator, $subj, $link) {
 
 $to 		= $email;
-$from 		= "noreply@dotpedia.com.ng";
+$from 		= "noreply@savearns.com";
 $cmessage 	= "Best Regards<br/> <i>Team DotPedia</i>";
 
 $headers  = "From: " . $from . "\r\n";
