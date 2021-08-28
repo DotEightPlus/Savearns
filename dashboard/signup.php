@@ -81,22 +81,38 @@ if(isset($_SESSION['login'])) {
                                 <div class="mb-3">
                                     <label>Telephone Number</label>
                                     <input type="number" id="tel" class="form-control" placeholder="Telephone Number"
-                                        aria-label="telephone" aria-describedby="telephone-addon">
+                                        aria-label="telephone" aria-describedby="telephone-addon" onfocus="telrr()">
                                     <p class="text-danger" id="tmsg"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label>Email Address</label>
                                     <input type="email" id="email" class="form-control" placeholder="Email"
-                                        aria-label="Email" aria-describedby="email-addon">
+                                        aria-label="Email" aria-describedby="email-addon" onfocus="emrr()">
                                     <p class="text-danger" id="emsg"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label>Create Username</label>
                                     <input type="text" id="usname" class="form-control" placeholder="Username"
-                                        aria-label="username" aria-describedby="user-addon">
+                                        aria-label="username" aria-describedby="user-addon" onfocus="usrr()">
                                     <p class="text-danger" id="usmsg"></p>
                                 </div>
 
+
+                                <div class="row">
+                                    <div class="mb-3 col-lg-6">
+                                        <label>Create Password</label>
+                                        <input type="password" id="pword" class="form-control" placeholder="Password"
+                                            aria-label="Password" aria-describedby="password-addon" onfocus="pwrr()">
+                                        <p class="text-danger" id="pwmsg"></p>
+                                    </div>
+                                    <div class="mb-3 col-lg-6">
+                                        <label>Confirm Password</label>
+                                        <input type="password" id="cpword" class="form-control"
+                                            placeholder="Confirm Password" aria-label="Password"
+                                            aria-describedby="password-addon" onfocus="cprr()">
+                                        <p class="text-danger" id="cpmsg"></p>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
                                     <label>Referral Code</label>
                                     <?php 
@@ -116,21 +132,7 @@ if(isset($_SESSION['login'])) {
                                     ?>
                                     <p class="text-danger" id="rfmsg"></p>
                                 </div>
-                                <div class="row">
-                                    <div class="mb-3 col-lg-6">
-                                        <label>Create Password</label>
-                                        <input type="password" id="pword" class="form-control" placeholder="Password"
-                                            aria-label="Password" aria-describedby="password-addon">
-                                        <p class="text-danger" id="pwmsg"></p>
-                                    </div>
-                                    <div class="mb-3 col-lg-6">
-                                        <label>Confirm Password</label>
-                                        <input type="password" id="cpword" class="form-control"
-                                            placeholder="Confirm Password" aria-label="Password"
-                                            aria-describedby="password-addon">
-                                        <p class="text-danger" id="cpmsg"></p>
-                                    </div>
-                                </div>
+
                                 <div class="text-center">
                                     <p class="text-danger" id="msg"></p>
                                     <button type="button" id="sub" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign
@@ -153,7 +155,27 @@ if(isset($_SESSION['login'])) {
     <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script>
     function fmsgrr() {
-        document.getElementById("fmsg").innerHTML = 'sbdb';
+        document.getElementById("fmsg").innerHTML = '';
+    }
+
+    function telrr() {
+        document.getElementById("tmsg").innerHTML = '';
+    }
+
+    function emrr() {
+        document.getElementById("emsg").innerHTML = '';
+    }
+
+    function usrr() {
+        document.getElementById("usmsg").innerHTML = '';
+    }
+
+    function pwrr() {
+        document.getElementById("pwmsg").innerHTML = '';
+    }
+
+    function cprr() {
+        document.getElementById("cpmsg").innerHTML = '';
     }
     </script>
     <script src="ajax.js"></script>
