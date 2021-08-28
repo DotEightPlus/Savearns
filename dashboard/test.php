@@ -52,6 +52,6 @@ $body = "
     $body .= "</body>
 
 </html>";
-echo $body;
+echo $_SESSION[''];
 
 ?>

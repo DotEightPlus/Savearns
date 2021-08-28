@@ -281,10 +281,12 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 	} else {
 
 		$row  = mysqli_fetch_array($rsl);
-		$user = $_SESSION['usname'] = $row['usname'];
+		$user = $row['usname'];
+
+		$_SESSION['usname'] = $user;
 		
 		echo 'Loading...Please Wait';
-		//echo '<script>window.location.href ="./signup"</script>';
+		echo '<script>window.location.href ="./"</script>';
 	}
 	}
 

@@ -70,72 +70,34 @@ if(isset($_SESSION['login'])) {
                 <div class="col-xl-8 col-lg-5 col-md-7 mx-auto" id="signup">
                     <div class="card z-index-0">
                         <div class="card-header text-center pt-4">
-                            <h2>Create a free account</h2>
+                            <h2>Welcome Back</h2>
                         </div>
 
                         <div class="card-body">
                             <form role="form text-left">
-                                <div class="mb-3">
-                                    <label>Full Name</label>
-                                    <input type="text" id="fname" class="form-control" placeholder="Name"
-                                        aria-label="Name" aria-describedby="email-addon" onfocus="fmsgrr()">
-                                </div>
-                                <div class="mb-3">
-                                    <label>Telephone Number</label>
-                                    <input type="number" id="tel" class="form-control" placeholder="Telephone Number"
-                                        aria-label="telephone" aria-describedby="telephone-addon" onfocus="telrr()">
-                                </div>
-                                <div class="mb-3">
-                                    <label>Email Address</label>
-                                    <input type="email" id="email" class="form-control" placeholder="Email"
-                                        aria-label="Email" aria-describedby="email-addon" onfocus="emrr()">
-                                </div>
-                                <div class="mb-3">
-                                    <label>Create Username</label>
-                                    <input type="text" id="usname" class="form-control" placeholder="Username"
-                                        aria-label="username" aria-describedby="user-addon" onfocus="usrr()">
-                                </div>
-
-
                                 <div class="row">
                                     <div class="mb-3 col-lg-6">
-                                        <label>Create Password</label>
-                                        <input type="password" id="pword" class="form-control" placeholder="Password"
-                                            aria-label="Password" aria-describedby="password-addon" onfocus="pwrr()">
+                                        <label>Username</label>
+                                        <input type="text" id="uname" class="form-control" placeholder="Input Username"
+                                            onfocus="pwrr()">
                                     </div>
                                     <div class="mb-3 col-lg-6">
-                                        <label>Confirm Password</label>
-                                        <input type="password" id="cpword" class="form-control"
-                                            placeholder="Confirm Password" aria-label="Password"
-                                            aria-describedby="password-addon" onfocus="cprr()">
+                                        <label>Password</label>
+                                        <input type="password" id="lpword" class="form-control"
+                                            placeholder="Input your Password" onfocus="cprr()">
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label>Referral Code</label>
-                                    <?php 
-                                if(isset($_GET['link'])) {
-
-                                    $ref = clean(escape($_GET['link']));
-
-                                    echo '
-                                    <input type="text" id="ref" class="form-control" placeholder="Referral Code"
-                                        aria-label="Referral" value="'.$ref.'" aria-describedby="Referral-addon" disabled>';
-                                    } else {
-
-                                        echo '
-                                        <input type="text" id="ref" class="form-control" placeholder="Referral Code"
-                                        aria-label="Referral" aria-describedby="Referral-addon">';
-                                    }
-                                    ?>
                                 </div>
 
                                 <div class="text-center">
                                     <p class="text-danger" id="msg"></p>
                                     <button type="button" id="sub" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign
-                                        up</button>
+                                        In</button>
                                 </div>
-                                <p class="text-sm mt-3 mb-0 text-center">Already have an account? <a href="./signin"
-                                        class="text-dark font-weight-bolder">Sign in</a></p>
+                                <h5 class="text-sm mt-3 mb-0 text-center"><a href="./forgot"
+                                        class="text-dark font-weight-bolder">Forgot password</a>
+                                    &nbsp;|&nbsp;
+                                    <a href="./signup" class="text-dark font-weight-bolder">Create a free account</a>
+                                </h5>
                             </form>
                         </div>
                     </div>

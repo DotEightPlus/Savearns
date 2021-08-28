@@ -63,6 +63,9 @@ $(document).ready(function () {
 //resend otp
 $("#rotp").click(function () {
 
+  document.getElementById("rvmsg").style.display = 'block';
+  document.getElementById("vmsg").style.display = 'none';
+
   var email = $("#otpmail").val();
   var otpp  = "1111";
 
@@ -90,6 +93,7 @@ $("#vsub").click(function () {
   var votp   = $("#otpper").val();
 
   document.getElementById("rvmsg").style.display = 'none';
+  document.getElementById("vmsg").style.display = 'block';
 
   if (email == "" || email == null) {
     $("#vmsg").html("Server Error!");
