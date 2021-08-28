@@ -154,7 +154,6 @@ function register($fname, $tel, $email, $uname, $pword, $ref) {
 	$fnam = escape($fname);
 	$emai = escape($email);
 	$unam = escape($uname);
-	$inst = escape($inst);
 	$pwor = md5($pword);
 
 	$datereg = date("Y-m-d");
@@ -174,7 +173,7 @@ mail_mailer($email, $activator, $subj);
 
 //open otp page
 echo 'Loading...Please Wait!';
-echo'<script>otpVerify();</script>';
+echo'<script>otpVerify(); signupClose();</script>';
 	 }
 
 
@@ -210,13 +209,13 @@ $body = "
 
 <body style='text-align: center;'>";
 $body .= "<section style='margin: 30px; margin-top: 50px ; background: #34459C; color: #fff;'>";
-$body .= "<img style='margin-top: 35px; width: 460px; height: 105px;' src='{$logo}' alt='DotPedia'>";
+$body .= "<img style='margin-top: 35px; width: 460px; height: 105px;' src='{$logo}' alt='Savearns'>";
 $body .= "<h1 style='margin-top: 45px; color: #fff'>Activate your email to continue</h1>
 <br />";
 $body .= "<h3 style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br /><br />
 Kindly use the otp below to activate your account;</h3>
 <br />";
-$body .= "<h2 style='margin-left: 45px; text-align: left;'><b>{$activator} 7473473</b></h2>
+$body .= "<h2 style='margin-left: 45px; text-align: left;'><b>{$activator}</b></h2>
 <br />";
 $body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this
 email. This is a virtual email</p>";
@@ -234,6 +233,21 @@ $body .= "</body></html>";
 $send = mail($to, $subject, $body, $headers);
 }
 
+
+/** RESEND OTP */
+if(isset($_POST['email']) && isset($_POST['otpp'])) {
+	
+	$email = clean(escape($_POST['email']));
+	
+	$activator = otp();	
+
+	$sql = "UPDATE users SET `activator` = '$activator'  WHERE `email` = '$email'";
+	$res = query($sql);
+
+	$subj = "VERIFY YOUR EMAIL";
+
+	mail_mailer($email, $activator, $subj);
+}
 
 
 /** SIGN IN USER **/

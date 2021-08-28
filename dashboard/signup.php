@@ -40,6 +40,9 @@ if(isset($_SESSION['login'])) {
     <!-- Nucleo Icons -->
     <link href="assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
+    <link href="assets/js/bootstrap.min.css" rel="stylesheet" />
+
+
     <!-- Font Awesome Icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link href="assets/css/nucleo-svg.css" rel="stylesheet" />
@@ -63,8 +66,8 @@ if(isset($_SESSION['login'])) {
 
         </div>
         <div class="container">
-            <div class="row mt-lg-n10 mt-md-n11 mt-n10" id="signup">
-                <div class="col-xl-8 col-lg-5 col-md-7 mx-auto">
+            <div class="row mt-lg-n10 mt-md-n11 mt-n10">
+                <div class="col-xl-8 col-lg-5 col-md-7 mx-auto" id="signup">
                     <div class="card z-index-0">
                         <div class="card-header text-center pt-4">
                             <h5>Create a free account</h5>
@@ -140,7 +143,7 @@ if(isset($_SESSION['login'])) {
 
 
 
-                <div class="col-xl-8 col-lg-5 col-md-7 mx-auto" id="verify">
+                <div style="display:none" class="col-xl-8 col-lg-5 col-md-7 mx-auto" id="verify">
                     <div class="card z-index-0">
                         <div class="card-header text-center pt-4">
                             <h5>Verify your account</h5>
@@ -150,10 +153,13 @@ if(isset($_SESSION['login'])) {
                         <div class="card-body">
                             <form role="form text-left">
                                 <div class="mb-3">
-                                    <label>OTP</label>
+                                    <label>Input OTP</label>
                                     <input type="number" id="otpper" class="form-control"
                                         placeholder="Input one time password" aria-label="Name"
                                         aria-describedby="otp-addon" onfocus="otpr()">
+
+                                    <input type="text" id="otpmail" class="form-control"
+                                        value="<?php echo $_SESSION['usemail'] ?>">
                                 </div>
 
 
@@ -161,7 +167,7 @@ if(isset($_SESSION['login'])) {
                                     <p class="text-danger" id="vmsg"></p>
                                     <button type="button" id="vsub" class="btn bg-gradient-dark w-100 my-4 mb-2">Verify
                                         Account</button>
-                                    <p class="text-sm mt-3 mb-0 text-center"> <a href="#"
+                                    <p class="text-sm mt-3 mb-0 text-center"> <a href="#" id="rotp"
                                             class="text-dark font-weight-bolder">Resend OTP</a></p>
                                 </div>
 
@@ -180,8 +186,15 @@ if(isset($_SESSION['login'])) {
     <script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script>
-    //close verify page by default
-    document.getElementById("verify").display.style = none;
+    //open verify page by default
+    function otpVerify() {
+        document.getElementById('verify').style.display = 'block';
+    }
+
+    //close signup page
+    function signupClose() {
+        document.getElementById('signup').style.display = 'none';
+    }
 
     //erase validations
     function fmsgrr() {

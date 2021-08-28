@@ -56,8 +56,32 @@ $(document).ready(function () {
           }
         }
       }
-    $("#exampleModalCenter").modal();
   });
+
+
+
+//resend otp
+$("#rotp").click(function () {
+
+  var email = $("#otpmail").val();
+  var otpp  = "1111";
+
+  if (email == "" || email == null) {
+    $("#vmsg").html("Server Error!");
+  } else {
+    $("#vmsg").html("New OTP Code sent to your email");
+    $.ajax({
+      type: "post",
+      url: "functions/init.php",
+      data: {email:email, otpp: otpp},
+      success: function (data) {
+        $("#vmsg").html(data);
+      },
+    });
+  }
+
+})
+
 
   //signin
   $("#signin").click(function () {
