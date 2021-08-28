@@ -2,7 +2,6 @@
 
 $to = $email;
 $from = "noreply@savearns.com";
-$cmessage = "Best Regards<br /> <i>Team DotPedia</i>";
 
 $headers = "From: " . $from . "\r\n";
 $headers .= "Reply-To: ". $from . "\r\n";
@@ -14,8 +13,8 @@ $headers .= "Importance: High\n";
 
 $subject = $subj;
 
-$logo = 'https://dotpedia.com.ng/images/cover.png';
-$url = 'https://dotpedia.com.ng';
+$logo = 'https://savearns.com/assets/3.png';
+$url = 'https://savearns.com/';
 
 $body = "
 <!DOCTYPE html>
@@ -23,30 +22,30 @@ $body = "
 
 <head>
     <meta charset='UTF-8'>
-    <title>DotLive from DotEightPlus</title>
+    <title>Savearns</title>
 </head>
-<link rel='stylesheet' href='http://localhost/teams/savearns/assets/css/bootstrap.min.css'>
+<link rel='stylesheet' href='https://savearns.com/assets/css/bootstrap.min.css'>
 
 <body style='text-align: center;'>";
     $body .= "<section style='margin: 30px; margin-top: 50px ; background: #34459C; color: #fff;'>";
-        $body .= "<img style='margin-top: 35px; width: 280px; height: 105px;' src='{$logo}' alt='DotPedia'>";
+        $body .= "<img style='margin-top: 35px; width: 460px; height: 105px;' src='{$logo}' alt='DotPedia'>";
         $body .= "<h1 style='margin-top: 45px; color: #fff'>Activate your email to continue</h1>
         <br />";
-        $body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br /><br />
-            Kindly use the otp below to activate your account;</p>
+        $body .= "<h3 style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br /><br />
+            Kindly use the otp below to activate your account;</h3>
         <br />";
-        $body .= "<h3 style='margin-left: 45px; text-align: left;'><b>{$activator} 7473473</b></h3>
+        $body .= "<h2 style='margin-left: 45px; text-align: left;'><b>{$activator} 7473473</b></h2>
         <br />";
         $body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this
             email. This is a virtual email</p>";
-        $body .= "<p text-align: center;'><a href='https://dotpedia.com.ng/contact'><img style='width:150px;heght:150px'
-                    src='http://localhost/teams/savearns/assets/footer.png'></a>";
+        $body .= "<p text-align: center;'><a href='https://savearns.com/contact'><img style='width:150px;heght:150px'
+                    src='https://savearns.com/assets/footer.png'></a>";
             $body .= "
-        <p style='text-align: center;'>Email.: <span style='color: #fff'>pdf@dotpedia.com.ng</span></p>";
-        $body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fff'>+234(0) 810 317 1902</span>
-        </p>";
-        $body .= "<h6 style='text-align: center; padding-bottom: 50px;'>Team Savearns</h6>";
-        $body .= "<script src='http://localhost/teams/savearns/vendors/bootstrap/bootstrap.min.js'></script>";
+        <h6 style='text-align: center;'>Email.: <span style='color: #fff'>savings@savearns.com</span></h6>";
+        $body .= "<h6 style='text-align: center;'>Call/Chat.: <span style='color: #fff'>+234(0) 810 317 1902</span>
+        </h6>";
+        $body .= "<h4 style='text-align: center; padding-bottom: 80px; padding-top: 40px;'>Team Savearns</h4>";    
+        $body .= "<script src='https://savearns.com/vendors/bootstrap/bootstrap.min.js'></script>";
         $body .= "
     </section>";
     $body .= "</body>
