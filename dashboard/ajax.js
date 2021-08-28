@@ -1,36 +1,32 @@
 $(document).ready(function () {
-  
+
   //signup
   $("#sub").click(function () {
     var fname = $("#fname").val();
     var tel = $("#tel").val();
     var email = $("#email").val();
-    var inst = $("#inst").val();
     var user = $("#usname").val();
     var pword = $("#pword").val();
     var cpword = $("#cpword").val();
     var ref = $("#ref").val();
 
     if (fname == "" || fname == null) {
-      $("#msg").html("Input your full name please");
+      $("#fmsg").html("Kindly input your full name.");
     } else {
       if (tel == "" || tel == null) {
-        $("#msg").html("Telephone number cannot be empty");
+        $("#tmsg").html("Telephone number cannot be empty");
       } else {
         if (email == "" || email == null) {
-          $("#msg").html("Invalid email address");
+          $("#emsg").html("Invalid email address");
         } else {
-          if (inst == "" || inst == null) {
-            $("#msg").html("Fill in your institution name");
-          } else {
-            if (user == "" || user == null) {
-              $("#msg").html("Create a username");
+           if (user == "" || user == null) {
+              $("#usmsg").html("Create a username");
             } else {
               if (pword == "" || pword == null) {
-                $("#msg").html("Create a secured password");
+                $("#pwmsg").html("Create a secured password");
               } else {
                 if (cpword == "" || cpword == null) {
-                  $("#msg").html("Confirm your password");
+                  $("#cpmsg").html("Confirm your password");
                 } else {
                   if (pword != cpword) {
                     $("#msg").html("Password does not match");
@@ -47,7 +43,6 @@ $(document).ready(function () {
                         user: user,
                         pword: pword,
                         cpword: cpword,
-                        inst: inst,
                         ref: ref,
                       },
                       success: function (data) {
@@ -61,7 +56,6 @@ $(document).ready(function () {
           }
         }
       }
-    }
     $("#exampleModalCenter").modal();
   });
 

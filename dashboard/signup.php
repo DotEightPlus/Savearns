@@ -64,7 +64,7 @@ if(isset($_SESSION['login'])) {
         </div>
         <div class="container">
             <div class="row mt-lg-n10 mt-md-n11 mt-n10">
-                <div class="col-xl-7 col-lg-5 col-md-7 mx-auto">
+                <div class="col-xl-8 col-lg-5 col-md-7 mx-auto">
                     <div class="card z-index-0">
                         <div class="card-header text-center pt-4">
                             <h5>Create a free account</h5>
@@ -75,8 +75,14 @@ if(isset($_SESSION['login'])) {
                                 <div class="mb-3">
                                     <label>Full Name</label>
                                     <input type="text" id="fname" class="form-control" placeholder="Name"
-                                        aria-label="Name" aria-describedby="email-addon">
+                                        aria-label="Name" aria-describedby="email-addon" onfocus="fmsgrr()">
                                     <p class="text-danger" id="fmsg"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Telephone Number</label>
+                                    <input type="number" id="tel" class="form-control" placeholder="Telephone Number"
+                                        aria-label="telephone" aria-describedby="telephone-addon">
+                                    <p class="text-danger" id="tmsg"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label>Email Address</label>
@@ -86,16 +92,11 @@ if(isset($_SESSION['login'])) {
                                 </div>
                                 <div class="mb-3">
                                     <label>Create Username</label>
-                                    <input type="text" id="email" class="form-control" placeholder="Username"
+                                    <input type="text" id="usname" class="form-control" placeholder="Username"
                                         aria-label="username" aria-describedby="user-addon">
                                     <p class="text-danger" id="usmsg"></p>
                                 </div>
-                                <div class="mb-3">
-                                    <label>Telephone Number</label>
-                                    <input type="number" id="tel" class="form-control" placeholder="Telephone Number"
-                                        aria-label="telephone" aria-describedby="telephone-addon">
-                                    <p class="text-danger" id="tmsg"></p>
-                                </div>
+
                                 <div class="mb-3">
                                     <label>Referral Code</label>
                                     <?php 
@@ -120,7 +121,7 @@ if(isset($_SESSION['login'])) {
                                         <label>Create Password</label>
                                         <input type="password" id="pword" class="form-control" placeholder="Password"
                                             aria-label="Password" aria-describedby="password-addon">
-                                        <p class="text-danger" id=pwmsg"></p>
+                                        <p class="text-danger" id="pwmsg"></p>
                                     </div>
                                     <div class="mb-3 col-lg-6">
                                         <label>Confirm Password</label>
@@ -147,8 +148,14 @@ if(isset($_SESSION['login'])) {
     <!--   Core JS Files   -->
     <script src="assets/js/core/popper.min.js"></script>
     <script src="assets/js/core/bootstrap.min.js"></script>
+    <script src="assets/js/jquery-3.3.1.min.js"></script>
     <script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
     <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script>
+    function fmsgrr() {
+        document.getElementById("fmsg").innerHTML = 'sbdb';
+    }
+    </script>
     <script src="ajax.js"></script>
 </body>
 
