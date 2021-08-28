@@ -1,3 +1,9 @@
+<?php include("functions/init.php"); 
+if(isset($_SESSION['login'])) {
+
+    unset($_SESSION['login']);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -61,29 +67,73 @@
                 <div class="col-xl-7 col-lg-5 col-md-7 mx-auto">
                     <div class="card z-index-0">
                         <div class="card-header text-center pt-4">
-                            <h5>Register with</h5>
+                            <h5>Create a free account</h5>
                         </div>
 
                         <div class="card-body">
                             <form role="form text-left">
                                 <div class="mb-3">
-                                    <input type="text" class="form-control" placeholder="Name" aria-label="Name"
-                                        aria-describedby="email-addon">
+                                    <label>Full Name</label>
+                                    <input type="text" id="fname" class="form-control" placeholder="Name"
+                                        aria-label="Name" aria-describedby="email-addon">
+                                    <p class="text-danger" id="fmsg"></p>
                                 </div>
                                 <div class="mb-3">
-                                    <input type="email" class="form-control" placeholder="Email" aria-label="Email"
-                                        aria-describedby="email-addon">
+                                    <label>Email Address</label>
+                                    <input type="email" id="email" class="form-control" placeholder="Email"
+                                        aria-label="Email" aria-describedby="email-addon">
+                                    <p class="text-danger" id="emsg"></p>
                                 </div>
                                 <div class="mb-3">
-                                    <input type="password" class="form-control" placeholder="Password"
-                                        aria-label="Password" aria-describedby="password-addon">
+                                    <label>Create Username</label>
+                                    <input type="text" id="email" class="form-control" placeholder="Username"
+                                        aria-label="username" aria-describedby="user-addon">
+                                    <p class="text-danger" id="usmsg"></p>
                                 </div>
                                 <div class="mb-3">
-                                    <input type="password" class="form-control" placeholder="Confirm Password"
-                                        aria-label="Password" aria-describedby="password-addon">
+                                    <label>Telephone Number</label>
+                                    <input type="number" id="tel" class="form-control" placeholder="Telephone Number"
+                                        aria-label="telephone" aria-describedby="telephone-addon">
+                                    <p class="text-danger" id="tmsg"></p>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Referral Code</label>
+                                    <?php 
+                                if(isset($_GET['link'])) {
+
+                                    $ref = clean(escape($_GET['link']));
+
+                                    echo '
+                                    <input type="text" id="ref" class="form-control" placeholder="Referral Code"
+                                        aria-label="Referral" value="'.$ref.'" aria-describedby="Referral-addon" disabled>';
+                                    } else {
+
+                                        echo '
+                                        <input type="text" id="ref" class="form-control" placeholder="Referral Code"
+                                        aria-label="Referral" aria-describedby="Referral-addon">';
+                                    }
+                                    ?>
+                                    <p class="text-danger" id="rfmsg"></p>
+                                </div>
+                                <div class="row">
+                                    <div class="mb-3 col-lg-6">
+                                        <label>Create Password</label>
+                                        <input type="password" id="pword" class="form-control" placeholder="Password"
+                                            aria-label="Password" aria-describedby="password-addon">
+                                        <p class="text-danger" id=pwmsg"></p>
+                                    </div>
+                                    <div class="mb-3 col-lg-6">
+                                        <label>Confirm Password</label>
+                                        <input type="password" id="cpword" class="form-control"
+                                            placeholder="Confirm Password" aria-label="Password"
+                                            aria-describedby="password-addon">
+                                        <p class="text-danger" id="cpmsg"></p>
+                                    </div>
                                 </div>
                                 <div class="text-center">
-                                    <button type="button" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign up</button>
+                                    <p class="text-danger" id="msg"></p>
+                                    <button type="button" id="sub" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign
+                                        up</button>
                                 </div>
                                 <p class="text-sm mt-3 mb-0 text-center">Already have an account? <a href="javascript:;"
                                         class="text-dark font-weight-bolder">Sign in</a></p>
