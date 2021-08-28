@@ -76,25 +76,21 @@ if(isset($_SESSION['login'])) {
                                     <label>Full Name</label>
                                     <input type="text" id="fname" class="form-control" placeholder="Name"
                                         aria-label="Name" aria-describedby="email-addon" onfocus="fmsgrr()">
-                                    <p class="text-danger" id="fmsg"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label>Telephone Number</label>
                                     <input type="number" id="tel" class="form-control" placeholder="Telephone Number"
                                         aria-label="telephone" aria-describedby="telephone-addon" onfocus="telrr()">
-                                    <p class="text-danger" id="tmsg"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label>Email Address</label>
                                     <input type="email" id="email" class="form-control" placeholder="Email"
                                         aria-label="Email" aria-describedby="email-addon" onfocus="emrr()">
-                                    <p class="text-danger" id="emsg"></p>
                                 </div>
                                 <div class="mb-3">
                                     <label>Create Username</label>
                                     <input type="text" id="usname" class="form-control" placeholder="Username"
                                         aria-label="username" aria-describedby="user-addon" onfocus="usrr()">
-                                    <p class="text-danger" id="usmsg"></p>
                                 </div>
 
 
@@ -103,14 +99,12 @@ if(isset($_SESSION['login'])) {
                                         <label>Create Password</label>
                                         <input type="password" id="pword" class="form-control" placeholder="Password"
                                             aria-label="Password" aria-describedby="password-addon" onfocus="pwrr()">
-                                        <p class="text-danger" id="pwmsg"></p>
                                     </div>
                                     <div class="mb-3 col-lg-6">
                                         <label>Confirm Password</label>
                                         <input type="password" id="cpword" class="form-control"
                                             placeholder="Confirm Password" aria-label="Password"
                                             aria-describedby="password-addon" onfocus="cprr()">
-                                        <p class="text-danger" id="cpmsg"></p>
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -130,7 +124,6 @@ if(isset($_SESSION['login'])) {
                                         aria-label="Referral" aria-describedby="Referral-addon">';
                                     }
                                     ?>
-                                    <p class="text-danger" id="rfmsg"></p>
                                 </div>
 
                                 <div class="text-center">
@@ -155,27 +148,27 @@ if(isset($_SESSION['login'])) {
     <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
     <script>
     function fmsgrr() {
-        document.getElementById("fmsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
     }
 
     function telrr() {
-        document.getElementById("tmsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
     }
 
     function emrr() {
-        document.getElementById("emsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
     }
 
     function usrr() {
-        document.getElementById("usmsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
     }
 
     function pwrr() {
-        document.getElementById("pwmsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
     }
 
     function cprr() {
-        document.getElementById("cpmsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
     }
     </script>
     <script src="ajax.js"></script>

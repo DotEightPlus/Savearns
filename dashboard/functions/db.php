@@ -1,15 +1,7 @@
 <?php
 //creating the database to use
-
-//heroku db
-//$con = mysqli_connect("us-cdbr-east-03.cleardb.com","b035ecdb1188fa","53fa1a7e","heroku_5f230635e2239b6");
-
-//local db
 $con = mysqli_connect("localhost","root","","savearns");
-
-
-//whogohost db
-//$con = mysqli_connect("localhost","paradi12_user","securemelikekilode","paradi12_dotlive");
+//$con = mysqli_connect("localhost","dotpedia_user","securemelikekilode","dotpedia_dotpedia");
 
 function row_count($result) {
 
@@ -33,6 +25,12 @@ function query($query) {
 		return mysqli_query($con, $query);
 }
 
+function insert() {
+		global $con;
+
+		return mysqli_insert_id($con);
+}
+
 
 function confirm($result) {
 		global $con;
@@ -40,13 +38,6 @@ function confirm($result) {
 
 		die("QUERY FAILED" . mysqli_error($con));
 	}
-}
-
-function last_id($last_id) {
-
-	global $con;
-
-	return mysqli_insert_id($con);
 }
 
 function fetch_array($result) {

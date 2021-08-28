@@ -12,7 +12,6 @@ function redirect($location) {
 	return header("Location: {$location}");
 }
 
-
 function set_message($message) {
 
 	if(!empty($message)) {
@@ -26,13 +25,6 @@ function set_message($message) {
 }
 
 
-function token_generator() {
-
-	$token = $_SESSION['token'] = md5(uniqid(mt_rand(), true));
-
-	return $token; 
-}
-
 
 function display_message() {
 
@@ -43,33 +35,37 @@ function display_message() {
 	}
 }
 
+function token_generator() {
+
+	$token = $_SESSION['token'] = md5(uniqid(mt_rand(), true));
+
+	return $token; 
+}
 
 function validation_errors($error_message) {
 
 $error_message = <<<DELIMITER
 
-<div style="background: #000000; color: white;" class="col-md-12 alert alert-danger alert-mg-b alert-success-style6 alert-st-bg3 alert-st-bg14">
-    <button type="button" style="color: white;" class="col-md-12 close success-op" data-dismiss="modal" aria-label="Close">
+<div class="col-md-12 alert alert-danger alert-mg-b alert-success-style6 alert-st-bg3 alert-st-bg14">
+    <button type="button" class="col-md-12 close sucess-op" data-dismiss="alert" aria-label="Close">
 		<span class="icon-sc-cl" aria-hidden="true">&times;</span>
 									</button>
-                 <p style="color: white;"><strong>$error_message </strong></p>
+                 <p><strong>$error_message </strong></p>
                             </div>
 DELIMITER;
 
    return $error_message;     
 
 }
-
-
 
 function validator($error_message) {
 
 $error_message = <<<DELIMITER
-<div style="background: #000000; color: white;" class="col-md-12 alert alert-danger alert-mg-b alert-success-style6 alert-st-bg3 alert-st-bg14">
-    <button type="button" style="color: white;" class="col-md-12 close success-op" data-dismiss="modal" aria-label="Close">
+<div style="background: #FFE9E6; color: #ff0000;" class="col-md-12 alert alert-danger alert-mg-b alert-success-style6 alert-st-bg3 alert-st-bg14">
+    <button type="button" style="color: white;" class="col-md-12 close sucess-op" data-dismiss="modal" aria-label="Close">
 		<span class="icon-sc-cl" aria-hidden="true">&times;</span>
 									</button>
-                 <p style="color: white;"><strong>$error_message </strong></p>
+                 <p><strong>$error_message </strong></p>
                             </div>
 DELIMITER;
 
@@ -78,12 +74,27 @@ DELIMITER;
 }
 
 
-/********** validate user functions *******/
 
+									/****** Helper Functions********/
 
 function email_exist($email) {
 
-	$sql = "SELECT * FROM signup WHERE email = '$email'";
+	$sql = "SELECT * FROM signup WHERE `email` = '$email'";
+	$result = query($sql);
+
+	if(row_count($result) == 1) {
+
+		return true;
+
+	}else {
+
+		return false;
+	} 
+}
+
+function username_exist($usname) {
+
+	$sql = "SELECT * FROM signup WHERE `usname` = '$usname'";
 	$result = query($sql);
 
 	if(row_count($result) == 1) {
@@ -98,1534 +109,641 @@ function email_exist($email) {
 
 
 
-/**********************validate user registration**********/
-
-$errors = [];
-
- 	if(isset($_POST['fname']) && isset($_POST['email']) && isset($_POST['pword']) && isset($_POST['cpword'])) {
 
 
-		$name 			= clean($_POST['fname']);
-		$email    		= clean($_POST['email']);
-		$pword    		= clean(md5($_POST['pword']));
-		$cpword    		= clean($_POST['cpword']);
+/** VALIDATE USER REGISTRATION **/
 
+if(isset($_POST['fname']) && isset($_POST['tel']) && isset($_POST['email']) && isset($_POST['pword']) && isset($_POST['cpword']) && isset($_POST['inst']) && isset($_POST['ref'])) {
 
-		if(email_exist($email)) {
+$fname 			= clean($_POST['fname']);
+$tel	 		= clean($_POST['tel']);
+$email	 		= clean($_POST['email']);
+$uname	 		= clean($_POST['user']);
+$pword    		= clean($_POST['pword']);
+$cpword 		= clean($_POST['cpword']);
+$inst			= clean($_POST['inst']);
+$ref            = clean(escape($_POST['ref']));
 
-			echo "Sorry! That email already has an account.";
+if(email_exist($email)) {
 
+			echo "Sorry! That email already has an account";
 		} else {
 
-   register_user($name, $email, $pword);
+if(username_exist($uname)) {
 
-
-		}
-}
-
-/****register user*****/
-function register_user($name, $email, $pword) {
-
-	$name 				= escape($name);
-	$email   			= escape($email);
-
-
-$sql = "INSERT INTO signup(`fname`, `email`, `pword`, `active`)";
-$sql.= " VALUES('$name', '$email', '$pword', '0')";
-$result = query($sql);
-confirm($result);
-
-verify($email);
-
-	 }
-
-
-
-
-//--------- Activate email registered ------------//
-
-function verify($email) {
-
-	$_SESSION['you'] = token_generator();
-	$verify 		 = $_SESSION['you'];
-	$you 			 = $email;
-
-	$_SESSION['email'] = $you;
-
-
-	$sql = "UPDATE signup SET `activator` = '$verify' WHERE `email` = '$you'";
-	$res = query($sql);
-
-
-
-	$to 		= $you;
-    $from 		= "noreply@boosttoken.org";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "Email Activation";
-
-    $logo = 'https://boosttoken.org/images/favicon.png';
-    $url  = 'https://boosttoken.org';
-    $link = 'https://boosttoken.org/./activate?id='.$verify;
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>Activate your email to continue</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> Thank you for creating an account with us. Kindly activate your email address;</p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #fbb710; text-decoration: none'>Click here to activate your email Address</a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-    $send = mail($to, $subject, $body, $headers);
-
-    echo "Loading...Please wait!";												
-	echo '<script>window.location.href ="./verify"</script>';
-
-}
-
-
-
-
-//------------ user login validation ----------//
-
-if (isset($_POST['email']) && isset($_POST['pword'])) {
-	
-
-	$usrname 	= clean($_POST['email']);
-	$password   = clean($_POST['pword']);
-	$email 		= clean($_POST['email']);
-
- 	
-		if(!email_exist($email)) {
-
-			echo "Wrong email inputed";
-		}
-
- 	else {
-
- login_user($usrname, $password);
-
-				}
-		} 
-
-// user login check
- function login_user($usrname, $password) {
-
-	$pword  	= md5($password);
-	$usrname 	= escape($usrname);
-	
-$sql = "SELECT * FROM `user` WHERE `email` = '$usrname' AND `pword` = '$pword'";
-$result = query($sql);
-if(row_count($result) == 1) {
-	$row = mysqli_fetch_array($result);
-
-	$user 	 = $row['email'];
-	$active  =  $row['active'];
-	$email   = $row['email']; 
-
-	if ($active == 0) {
-		echo "Loading... Please wait";
-		verify($email);
-		echo '<script>window.location.href ="./verify"</script>';
-	} else {
-
-	if($usrname == $user || isset($_SESSION['you'])) {
-		$_SESSION['Username'] = $usrname;
-		unset($_SESSION['you']);
-
-		echo "Loading...Please wait!";												
-		echo '<script>window.location.href ="./apartments"</script>';
-	}
-}
-} else {
-
-		echo "Wrong Password";
-	}
-
-}
-
-
-
-//----------- forgot password ---- //
-if (isset($_POST['mail'])) {
-	
-	$email 				= clean($_POST['mail']);
-
- if(!email_exist($email)) {
-
-			echo "That email does not have an account";
-		}else {
-
-	$_SESSION['me']		= token_generator();
-	$me 				= $_SESSION['me'];
-
-
-	$sql = "UPDATE user SET `activator` = '$me' WHERE `email` = '$email'";
-	$res = query($sql);
-
-
-
-	$to 		= $email;
-    $from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "Recover Password";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./recovery?id='.$me;
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>Password Recovery</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> You requested a reset of your password</p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #fbb710; text-decoration: none'>Click here to recover your password</a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Kindly ignore this message if you didn`t request for a password reset.</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-
-    $send = mail($to, $subject, $body, $headers);
-
-    $_SESSION['femail'] = $to;
-
-   echo "Loading...Please wait!";												
-   echo '<script>window.location.href ="./recover"</script>';
-}
-}
-
-
-
-//----------------- recover password ------------//
-
-if (isset($_POST['urpword']) && isset($_POST['ucpword'])) {
-	
-	$pword 		= md5($_POST['urpword']);
-	$me 		= $_SESSION['recc'];
-
-
-	$sql = "UPDATE user SET `pword` = '$pword', `activator` = '' WHERE `email` = '$me'";
-	$res = query($sql);
-
-	echo "Loading... Please wait!";
-
-	echo '<script>window.location.href ="./updated"</script>';
-
-}
-
-
-
-//--------------------------- dashboard ---------------------------------------------///
-
-if (isset($_POST['suite']) && isset($_POST['uapty']) && isset($_POST['waterty']) && isset($_POST['pwrsrc']) && isset($_POST['state']) && isset($_POST['ultel']) && isset($_POST['apmail']) && isset($_POST['price']) && isset($_POST['loc']) && isset($_POST['desc']) && isset($_POST['aptact']) && isset($_POST['aptbnk']) && isset($_POST['toi'])) {
-	
-
-$suite 			= clean($_POST['suite']);
-$apty	 		= clean($_POST['uapty']);
-$waterty 		= clean($_POST['waterty']);
-$pwrsrc    		= clean($_POST['pwrsrc']);
-$state 	 		= clean($_POST['state']);
-$ultel    		= clean($_POST['ultel']);
-$apmail         = clean($_POST['apmail']);
-$price 			= clean($_POST['price']);
-$loc            = clean($_POST['loc']);
-$desc  			= clean($_POST['desc']);
-$aptact			= clean($_POST['aptact']);
-$aptbnk			= clean($_POST['aptbnk']);
-$toi 			= clean($_POST['toi']);
-
-
-
-
-upload_apt($suite, $apty, $waterty, $pwrsrc, $state, $ultel, $apmail, $price, $loc, $desc, $aptact, $aptbnk, $toi);
-}
-
-
-//upload apartment
-function upload_apt($suite, $apty, $waterty, $pwrsrc, $state, $ultel, $apmail, $price, $loc, $desc, $aptact, $aptbnk, $toi) {
-
-$sql = "INSERT INTO apartment(`sn`, `apt`, `apartment`, `location`, `description`, `price`, `water`, `power`, `status`, `uploader`, `tel`, `acct`, `bank`, `state`, `toilet`)";
-$sql.= " VALUES('1' , '$suite', '$apty', '$loc', '$desc', '$price', '$waterty', '$pwrsrc', 'available', '$apmail', '$ultel', '$aptact', '$aptbnk', '$state', '$toi')";
-$result = query($sql);
-
-echo 'Loading... Please wait!';
-echo '<script>window.location.href ="./uploadagreed?id='.$suite.'"</script>';
-	 }		
-
-
-
-//Apartment image
-if (!empty($_FILES["file"]["name"])) {
-	
-			$target_dir = "../upload/apartment/";
-			$target_file =  basename($_FILES["file"]["name"]);
-			$targetFilePath = $target_dir . $target_file;
-			$uploadOk = 1;
-			$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-	
-			   
-			// Check if file already exists
-			if (file_exists($targetFilePath)) {
-			    echo "Sorry, this apartment Image is already registered on our database. Kindly rename your file and try again.";
-			    $uploadOk = 0;
-			} else {
-
-			// Allow certain file formats
-			if($imageFileType != "jpg" && $imageFileType != "jpeg") {
-			    echo "Sorry, only JPG and JPEG files are allowed.";
-			    $uploadOk = 0;
-			} else {
-			// Check if $uploadOk is set to 0 by an error
-			if ($uploadOk == 0) {
-			   echo "Sorry, your apartment Image was not uploaded.";
-			// if everything is ok, try to upload file
-			} else {
-			   
-			   move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath);
-			   img_prod($target_file);
-			   echo 'Loading.. Please wait!';
-   			echo '<script>window.location.href ="./uploaded"</script>';
-		}
-	}	    	
-}
-}
-
-
-///sql update product image
-function img_prod($target_file) {
-
-	$proid    = $_SESSION['aptimg'];
-
-	$sql 	  = "UPDATE apartment SET `pix` = '$target_file' WHERE `apt` = '$proid'";
-	$res = query($sql);
-
-	echo 'Loading.. Please wait!';
-
-	unset($_SESSION['aptimg']);
-}
-
-
-
-
-/************validate update password*******/
-function validate_update() {
-$errors = [];
-
-	
-
-	if($_SERVER['REQUEST_METHOD'] == "POST") {
-
-			$pword           = md5($_POST['pword']);
-			$cpword      	 = md5($_POST['cpword']);
+			echo "That username has been taken!";
+		} else {
 
 
 if($pword != $cpword) {
 
-			$errors[] = "Password doesn`t match!";
-		}
-
-			if(!empty($errors)) {
-
-				foreach ($errors as $error) {
+			echo "Password doesn`t match!";
 			
-	                echo validation_errors($error); 
-
-				}
-
-			} else {
-
-				if(updte($pword, $cpword)) {
-					
-					echo validation_errors("Wrong Password or Username!");
-				} else {
-
-					
-					echo validation_errors("Password updated successfully");
-				}
-			} 
-
+		} else {
+			register($fname, $tel, $email, $uname, $pword, $inst, $ref);
 		}
-
-} //function
-
-/************************ user login functions**********/
-
-function updte($pword, $cpword) {
-
-	$us 		= $_SESSION['Username'];
-	
-$sqll = "UPDATE user SET `pword` ='$pword' WHERE `email`= '$us'";
-$res = query($sqll);
 	}
+	}
+	} // post request
 
 
-
-function rev() {
-if($_SERVER['REQUEST_METHOD'] == "POST") {
-
-$msg 			= $_POST['msg'];
-$ref	 		= rand(0, 9999999);
-$usname	 		= $_SESSION['Username'];
-$date    		= date("Y-m-d h-i-sa");
-$stat 	 		= "Open";
-
-
-$sql = "INSERT INTO support(`sn`, `SupportRef`, `Username`, `Msg`, `Datesent`, `Status`)";
-$sql.= " VALUES('1', '$ref', '$usname', '$msg', '$date', '$stat')";
-$result = query($sql);
-redirect("./sent");
-}
-}	
-
-//--------------- edit apartment --------------//
-if (isset($_POST['edsuite']) && isset($_POST['eduapty']) && isset($_POST['edwaterty']) && isset($_POST['edpwrsrc']) && isset($_POST['edstate']) && isset($_POST['edultel']) && isset($_POST['edapmail']) && isset($_POST['edprice']) && isset($_POST['edloc']) && isset($_POST['eddesc']) && isset($_POST['edaptact']) && isset($_POST['edaptbnk']) && isset($_POST['edtoi'])) {
 	
 
-$suite 			= clean($_POST['edsuite']);
-$apty	 		= clean($_POST['eduapty']);
-$waterty 		= clean($_POST['edwaterty']);
-$pwrsrc    		= clean($_POST['edpwrsrc']);
-$state 	 		= clean($_POST['edstate']);
-$ultel    		= clean($_POST['edultel']);
-$apmail         = clean($_POST['edapmail']);
-$price 			= clean($_POST['edprice']);
-$loc            = clean($_POST['edloc']);
-$desc  			= clean($_POST['eddesc']);
-$aptact			= clean($_POST['edaptact']);
-$aptbnk			= clean($_POST['edaptbnk']);
-$toi 			= clean($_POST['edtoi']);
+/** REGISTER USER **/
+function register($fname, $tel, $email, $uname, $pword, $inst, $ref) {
 
+	$fnam = escape($fname);
+	$emai = escape($email);
+	$unam = escape($uname);
+	$inst = escape($inst);
+	$pwor = md5($pword);
 
+	$datereg = date("Y-m-d");
 
-
-edupload_apt($suite, $apty, $waterty, $pwrsrc, $state, $ultel, $apmail, $price, $loc, $desc, $aptact, $aptbnk, $toi);
-}
-
-
-//upload apartment
-function edupload_apt($suite, $apty, $waterty, $pwrsrc, $state, $ultel, $apmail, $price, $loc, $desc, $aptact, $aptbnk, $toi) {
-
-$sql = "UPDATE apartment SET `sn` = '1', `apartment` = '$apty', `location` = '$loc', `description` = '$desc', `price` = '$price', `water` = '$waterty', `power` = '$pwrsrc', `status` = 'available', `uploader` = '$apmail', `tel` = '$ultel', `acct` = '$aptact', `bank` = '$aptbnk', `state` = '$state', `toilet` = '$toi' WHERE `apt` = '$suite'";
+	$activator = token_generator();
+	
+$sql = "INSERT INTO signup(`id`, `fname`, `usname`, `email`, `pword`, `datereg`, `active`, `tel`, `inst`, `activator`, `vrf`, `ref`, `pvf`)";
+$sql.= " VALUES('1', '$fnam', '$unam', '$emai', '$pwor', '$datereg', '0', '$tel', '$inst', '$activator', 'No', '$ref', '0')";
 $result = query($sql);
 
-echo 'Loading... Please wait!';
-echo '<script>window.location.href ="./eduploadagreed?id='.$suite.'"</script>';
+//redirect to verify function
+$subj = "VERIFY YOUR EMAIL";
+$link = "https://dotpedia.com.ng/./activate?vef=".$activator;
+
+$_SESSION['usemail'] = $email;
+
+mail_mailer($email, $activator, $subj, $link);
+
+//redirect to verify page
+echo 'Loading...Please Wait!';
+echo '<script>window.location.href ="./verify"</script>';
 	 }
 
 
 
-//-------------------- ads upload ------------------//
-if (isset($_POST['adsid']) && isset($_POST['tagl']) && isset($_POST['dura']) && isset($_POST['targ']) && isset($_POST['link']) && isset($_POST['descp'])) {
+/* MAIL VERIFICATIONS */
+function mail_mailer($email, $activator, $subj, $link) {
+
+$to 		= $email;
+$from 		= "noreply@dotpedia.com.ng";
+$cmessage 	= "Best Regards<br/> <i>Team DotPedia</i>";
+
+$headers  = "From: " . $from . "\r\n";
+$headers .= "Reply-To: ". $from . "\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
+$headers .= "X-Priority: 1 (Highest)\n";
+$headers .= "X-MSMail-Priority: High\n";
+$headers .= "Importance: High\n";
+
+$subject = $subj;
+
+$logo = 'https://dotpedia.com.ng/images/cover.png';
+$url  = 'https://dotpedia.com.ng';
+
+$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotpedia.com.ng/css/bootstrap.min.css'><body style='text-align: center;'>";
+$body .= "<section style='margin: 30px; margin-top: 50px ; background: #FFE9E6; color: #000;'>";
+$body .= "<img style='margin-top: 35px; width: 280px; height: 105px;' src='{$logo}' alt='DotPedia'>";
+$body .= "<h1 style='margin-top: 45px; color: #ff0000'>Activate your email to continue</h1>
+<br/>";
+$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> Thank you for signing up.;</p>";
+$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>We've credited you free 5 PDFs Credit to get started.;</p>
+<br/>";
+$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #ff0000; text-decoration: none'><b>Click here to activate your email Address</b></a></p>
+<br/>";
+$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
+$body .= "<p text-align: center;'><a href='https://dotpedia.com.ng/contact'><img src='https://dotpedia.com.ng/images/6.png'></a>";
+$body .= "<p style='text-align: center;'>Email.: <span style='color: #ff0000'>pdf@dotpedia.com.ng</span></p>";	
+$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #ff0000'>+234(0) 810 317 1902</span></p>";	
+$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotPedia from DotEightPlus</p>";	
+$body .= "<script src='https://dotpedia.com.ng/js/bootstrap.min.js'></script>";
+$body .= "</section>";	
+$body .= "</body></html>";
+$send = mail($to, $subject, $body, $headers);
+}
+
+
+
+/** SIGN IN USER **/
+ 	if(isset($_POST['username']) && isset($_POST['password'])) {
+
+			$username        = clean(escape($_POST['username']));
+			$password   	 = md5($_POST['password']);
+
+			$sql = "SELECT * FROM `signup` WHERE `usname` = '$username' AND `pword` = '$password'";
+			$result = query($sql);
+			if(row_count($result) == 1) {
+
+				$row 	= mysqli_fetch_array($result);
+				$user 	= $row['usname'];
+				$active = $row['active'];
+				$email 	= $row['email'];
+
+				if ($active == 0) {
+
+					$activator = token_generator();
+
+					$_SESSION['usemail'] = $email;
+
+					//update activation link
+					$ups = "UPDATE signup SET `activator` = '$activator' WHERE `usname` = '$username'";
+					$ues = query($ups);
+
+					//redirect to verify function
+					$subj    = "VERIFY YOUR EMAIL";
+					$link 	 = "https://dotpedia.com.ng/./activate?vef=".$activator;
+
+					mail_mailer($email, $activator, $subj, $link);
+
+					//redirect to verify page
+					echo '<script>window.location.href ="./verify"</script>';	
+					
+				}  else {
+
+					if($username == $user) {
+						
+						$_SESSION['login'] = $username;
+
+						echo 'Loading...Please Wait';	
+
+						echo '<script>window.location.href ="./pdf"</script>';	
+					} else {
+
+						echo "This username doesn't have an account.";
+					}
+
+			} 
+
+		}else {
+
+		         echo 'Loading...Please Wait!';
+                         echo '<script>window.location.href ="./forgot"</script>';;
+		}
+	}
+
+
+
+/** FORGOT PASSWORD **/
+if(isset($_POST['fgeml'])) {
 	
-$adsid			= clean($_POST['adsid']);
-$tagl	 		= clean($_POST['tagl']);
-$dura   		= clean($_POST['dura']); 
-$targ   		= clean($_POST['targ']);
-$link   		= clean($_POST['link']);
-$descp    		= clean($_POST['descp']);
+	$email  = clean(escape($_POST['fgeml']));
 
-$r 				= $_SESSION['Username'];
+	if(!email_exist($email)) {
+
+		echo "Sorry! This email doesn't exit";
+		
+	} else {
+
+	$activator = token_generator();
+
+	$ssl = "UPDATE signup SET `activator` = '$activator' WHERE `email` = '$email'";
+	$rsl = query($ssl);
+
+	//redirect to verify function
+	$subj = "RESET YOUR PASSWORD";
+	$link = "https://dotpedia.com.ng/./reset?vef=".$activator;
+
+	$_SESSION['fgeml'] = $email;
+
+	fgmail_mailer($email, $activator, $subj, $link);
+
+	//redirect to verify page
+	echo 'Loading...Please Wait!';
+	echo '<script>window.location.href ="./recover"</script>';
+
+	}
+}
 
 
-//get ads pricing
-if ($dura == "A Day") {
+/** FORGOT PASSWORD EMAIL **/
+function fgmail_mailer($email, $activator, $subj, $link) {
 	
-	$price = 500;
-	$exp   = date('Y-m-d h:i:sa', strtotime($dura. ' + 1 days'));
-} else {
+$to 		= $email;
+$from 		= "noreply@dotpedia.com.ng";
+$cmessage 	= "Best Regards<br/> <i>Team DotPedia</i>";
 
-if ($dura == "A Week") {
-	
-	$price = 3000;
-	$exp   = date('Y-m-d h:i:sa', strtotime($dura. ' + 1 week'));
-} else {
+$headers  = "From: " . $from . "\r\n";
+$headers .= "Reply-To: ". $from . "\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
+$headers .= "X-Priority: 1 (Highest)\n";
+$headers .= "X-MSMail-Priority: High\n";
+$headers .= "Importance: High\n";
 
-if ($dura == "3 Days") {
-	
-	$price = 1000;
-	$exp   = date('Y-m-d h:i:sa', strtotime($dura. ' + 3 days'));
-} else {
+$subject = $subj;
 
-if ($dura == "A Month") {
-	
-	$price = 14000;
-	$exp   = date('Y-m-d h:i:sa', strtotime($dura. ' + 1 month'));
-} else {
+$logo = 'https://dotpedia.com.ng/images/cover.png';
+$url  = 'https://dotpedia.com.ng';
 
-if ($dura == "A Year") {
-	
-	$price = 160000;
-	$exp   = date('Y-m-d h:i:sa', strtotime($dura. ' + 1 year'));
-}
-}
-}
-}
-}
+$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotpedia.com.ng/css/bootstrap.min.css'><body style='text-align: center;'>";
+$body .= "<section style='margin: 30px; margin-top: 50px ; background: #FFE9E6; color: #000;'>";
+$body .= "<img style='margin-top: 35px; width: 280px; height: 105px;' src='{$logo}' alt='DotPedia'>";
+$body .= "<h1 style='margin-top: 45px; color: #ff0000'>Recover Your Password</h1>
+<br/>";
+$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> You requested for a password reset</p><br/>";
 
-//check if user has enough funds
-$sql = "SELECT * FROM user WHERE `email` = '$r'";
-$res = query($sql);
-$row = mysqli_fetch_array($res);
-
-$avlamt = $row['wallet'];
-$tel    = $row['tel'];
-
-$date   = date('Y-m-d');
-
-if ($avlamt >= $price) {
-
-	//deduct wallet balance
-	$walbal = $avlamt - $price;
-	$seqel  = "UPDATE user SET `wallet` = '$walbal' WHERE `email` = '$r'";
-	$resl   = query($seqel);
-
-	//insert details into transactions history
-
-	$tran = "DLADS-".date("Y").rand(0, 99999999);
-
-	$sll = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$sll.= "VALUES('$tran', '$r', '$walbal', '$date', 'Ads Payment', 'paid', 'wallet', 'debit')";
-	$rll = query($sll);
-	
-	activateads($adsid, $tagl, $dura, $targ, $link, $descp, $price, $tel, $r, $exp);
-} else {
-
-	echo "You don`t have enough funds in your wallet to run this advert.<br/> Kindly fund your wallet with an amount above NGN".number_format($price)." to run this ad.";
-}
+$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #ff0000; text-decoration: none'><b>Click here to recover your password</b></a></p>
+<br/>";
+$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Kindly ignore this mail if this wasn't from you.</p>";	
+$body .= "<p text-align: center;'><a href='https://dotpedia.com.ng/contact'><img src='https://dotpedia.com.ng/images/6.png'></a>";
+$body .= "<p style='text-align: center;'>Email.: <span style='color: #ff0000'>pdf@dotpedia.com.ng</span></p>";	
+$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #ff0000'>+234(0) 810 317 1902</span></p>";	
+$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotPedia from DotEightPlus</p>";	
+$body .= "<script src='https://dotpedia.com.ng/js/bootstrap.min.js'></script>";
+$body .= "</section>";	
+$body .= "</body></html>";
+$send = mail($to, $subject, $body, $headers);
 }
 
 
-function activateads($adsid, $tagl, $dura, $targ, $link, $descp, $price, $tel, $r, $exp) {
 
-$date = date("Y-m-d h:i:sa");
+/** RESET PASSWORD **/
+if(isset($_POST['fgpword']) && isset($_POST['fgcpword']) && isset($_POST['act'])) {
 
-$sql = "INSERT INTO ads(`sn`, `ads_id`, `tagline`, `descrip`, `user`, `date`, `duration`, `price`, `session`, `tel`, `link`, `target`, `click`, `expiry`)";
-$sql.= " VALUES('1', '$adsid', '$tagl', '$descp', '$r', '$date', '$dura', '$price', 'active', '$tel', '$link', '$targ', '0', '$exp')";
-$result = query($sql);
+	$fgpword = md5($_POST['fgpword']);
+        $eml = $_SESSION['fgeml'];
 
-echo "Loading.. Please wait";
-echo '<script>window.location.href ="./adfile?id='.$adsid.'"</script>';
+	$sql = "UPDATE signup SET `pword` = '$fgpword', `activator` = '' WHERE `email` = '$eml'";
+	$rsl = query($sql);
+
+	//redirect to verify page
+	echo 'Loading...Please Wait!';
+	echo '<script>window.location.href ="./updated"</script>';
 }
 
 
-//ads image upload
+
+
+/** UPLOAD PROFILE PICTURE **/
 if (!empty($_FILES["fle"]["name"])) {
 	
-			$target_dir = "../upload/ads/";
-			$target_file =  basename($_FILES["fle"]["name"]);
+	$target_dir = "../images/profilepix/";
+	$target_file =  basename($_FILES["fle"]["name"]);
+	$targetFilePath = $target_dir . $target_file;
+	$uploadOk = 1;
+	$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+
+	   
+		// Allow certain file formats
+	if($imageFileType != "jpg" && $imageFileType != "jpeg" && $imageFileType != "png") {
+		echo "Sorry, this image format is not allowed";
+		$uploadOk = 0;
+	} else {
+	// Check if $uploadOk is set to 0 by an error
+	if ($uploadOk == 0) {
+	   echo "Sorry, your profile picture was not uploaded.";
+	// if everything is ok, try to upload file
+	} else {
+	   
+	   move_uploaded_file($_FILES["fle"]["tmp_name"], $targetFilePath);
+	   img_prod($target_file);
+
+	  echo 'Loading...Please Wait!';
+	  echo '<script>window.location.href ="./profile"</script>';
+}
+}	    	
+}
+
+
+
+/** UPDATE PROFILE PICTURE SCRIPT **/
+function img_prod($target_file) {
+
+	$proid    = $_SESSION['login'];
+
+	$sql = "UPDATE signup SET `pix` = '$target_file' WHERE `usname` = '$proid'";
+	$res = query($sql);
+}
+
+
+
+/** GLOBAL CHECK **/
+function global_check() {
+
+	$idl = $_SESSION['login'];
+	
+	$sql = "SELECT * FROM signup WHERE `usname` = '$idl'";
+	$rsl = query($sql);
+
+	if(row_count($rsl) == '') {
+
+		redirect("./signup");
+		
+	} else {
+
+		$row = mysqli_fetch_array($rsl);
+
+	}
+	
+}
+
+
+/** DEDUCT PDF CREDIT FOR PQ */
+function pqpdfcredit() {
+
+	$user = $_SESSION['login'];
+    
+    $dds = "SELECT * FROM signup WHERE `usname` = '$user'";
+    $rds = query($dds);
+
+    $dws = mysqli_fetch_array($rds);
+
+    $pdd = $dws['pdfcredit'];
+
+    //check if user have enough pdf credit
+    if($pdd <= 1) {
+
+        //alert
+        echo '<script>
+        if(confirm("You do not have sufficient PDF Credit!")){
+            txt = window.location.href = "./credit";
+        } else {
+            txt = window.location.href = "./credit";
+        }
+        </script>';
+        
+    } else {
+
+    $a = (int)$pdd - 1;
+
+    $pds = "UPDATE signup SET `pdfcredit` = '$a' WHERE `usname` = '$user'";
+    $psl = query($pds);
+
+
+    }
+}
+
+
+
+
+/** DEDUCT PDF CREDIT FOR TAKE A TEST - CBT */
+function cbtpdfcredit() {
+
+	$user = $_SESSION['login'];
+    
+    $dds = "SELECT * FROM signup WHERE `usname` = '$user'";
+    $rds = query($dds);
+
+    $dws = mysqli_fetch_array($rds);
+
+    $pdd = $dws['pdfcredit'];
+
+    //check if user have enough pdf credit
+    if($pdd <= 2) {
+
+        //alert
+        echo '<script>
+        if(confirm("You do not have sufficient PDF Credit!")){
+            txt = window.location.href = "./credit";
+        } else {
+            txt = window.location.href = "./credit";
+        }
+        </script>';
+        
+    } else {
+
+    $a = (int)$pdd - 3;
+
+    $pds = "UPDATE signup SET `pdfcredit` = '$a' WHERE `usname` = '$user'";
+    $psl = query($pds);
+
+	redirect("admin/cbt/");
+    }
+}
+
+
+
+/** UPLOAD PDF */
+function uploadpdf() {
+	
+
+if(isset($_POST['donatenow'])) {
+
+	$inst 	= $_POST['inst'];
+	$typ 	= $_POST['typ'];
+	$title 	= $_POST['coursetitle'];
+	$ccode 	= $_POST['coursecode'];
+	$fcg	= $_POST['fcg'];
+	$dept   = $_POST['dept'];
+	$level  = $_POST['level'];
+
+	$upl    = $_SESSION['login'];
+
+	$pedia  = "pedia".rand(0, 9999);
+
+	//check if the uploader is verified
+	$sql = "SELECT * FROM signup WHERE `usname` = '$upl'";
+	$rsl = query($sql);
+
+	if(row_count($rsl) == '') {
+
+		redirect("./signup");
+		
+	} else {
+
+		$row = mysqli_fetch_array($rsl);
+		
+			$target_dir = "pdfs/";
+			$target_file =  basename($_FILES["pdffile"]["name"]);
 			$targetFilePath = $target_dir . $target_file;
 			$uploadOk = 1;
 			$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
-	
-			
+		
+			   
 			// Allow certain file formats
-			if($imageFileType != "jpg" && $imageFileType != "jpeg") {
-			    echo "Sorry, only JPG and JPEG files are allowed.";
-			    $uploadOk = 0;
+			if($imageFileType != "pdf") {
+				echo validator("Sorry, only .pdf file format is allowed");
+				$uploadOk = 0;
 			} else {
 			// Check if $uploadOk is set to 0 by an error
 			if ($uploadOk == 0) {
-			   echo "Sorry, your ads image was not uploaded.";
+			   echo validator("Sorry, your file was not uploaded.");
 			// if everything is ok, try to upload file
 			} else {
 			   
-			   move_uploaded_file($_FILES["fle"]["tmp_name"], $targetFilePath);
-			   img_ads($target_file);
-   			
-		
-	}	    	
-}
-}
-
-
-///sql update ads image
-function img_ads($target_file) {
-
-	$code     = $_SESSION['adsimg'];
-
-	$sql 	  = "UPDATE ads SET `file` = '$target_file' WHERE `ads_id` = '$code'";
-	$res 	  = query($sql);
-
-	echo 'Loading.. Please wait';
-	echo '<script>window.location.href ="./done"</script>';
-
-}
-
-
-//------- edit ads ----------//
-if (isset($_POST['edadsid']) && isset($_POST['edtagl']) && isset($_POST['eddura']) && isset($_POST['edtarg']) && isset($_POST['edlink']) && isset($_POST['eddescp'])) {
+			   move_uploaded_file($_FILES["pdffile"]["tmp_name"], $targetFilePath);
 	
-$edadsid		= clean($_POST['edadsid']);
-$edtagl	 		= clean($_POST['edtagl']);
-$eddura   		= clean($_POST['eddura']); 
-$edtarg   		= clean($_POST['edtarg']);
-$edlink   		= clean($_POST['edlink']);
-$eddescp    	= clean($_POST['eddescp']);
+	if($row['pvf'] == '1') {
+				
+		//approve PDF and upload details
+		$ssl = "INSERT INTO pdf(`sn`, `inst`, `typ`, `title`, `code`, `fcg`, `dept`, `level`, `upld`, `dwnld`, `approve`, `earn`, `pedia`, `filer`)";
+		$ssl.= "VALUES('1', '$inst', '$typ', '$title', '$ccode', '$fcg', '$dept', '$level', '$upl', '0', 'Yes', '2', '$pedia', '$target_file')";
+		$result = query($ssl);
 
-$edr			= $_SESSION['Username'];
+		$_SESSION['uploaded'] = "Your PDF was approved and uploaded successfully";
 
-
-//check if ads is still active
-$sql2 = "SELECT * FROM ads where `user` = '$r' AND `ads_id` = '$edadsid'";
-$res2 = query($sql2);
-$row2 = mysqli_fetch_array($res2);
-if ($row2['expiry'] == "expired") {
-	
-	echo "You can`t edit this ad. It has expired!";
-} else {
-
-
-
-//get user telephone
-$sql = "SELECT * FROM user WHERE `email` = '$edr'";
-$res = query($sql);
-$row = mysqli_fetch_array($res);
-
-$edtel    = $row['tel'];
-	
-	edactivateads($edadsid, $edtagl, $edtarg, $edlink, $eddescp, $edtel, $edr);
-
-}
-}
-
-
-function edactivateads($edadsid, $edtagl, $edtarg, $edlink, $eddescp, $edtel, $edr) {
-
-$sql = "UPDATE ads SET `tagline` = '$edtagl', `descrip` = '$eddescp', `tel` = '$edtel', `link` = '$edlink', `target` = '$edtarg' WHERE `ads_id` = '$edadsid' AND `user` = '$edr'";
-$result = query($sql);
-
-echo "Loading.. Please wait";
-echo '<script>window.location.href ="./edadfile?id='.$edadsid.'"</script>';
-}
-
-
-//---- count ads click ----//
-if (isset($_POST['adsid']) && isset($_POST['click'])) {
-	
-	$ads = $_POST['adsid'];
-	$clc = $_POST['click'];
-
-	$clck = $clc + 1;
-
-	$sql = "UPDATE ads SET `click` = '$clck' WHERE `ads_id` = '$ads'";
-	$res = query($sql);
-
-}
-
-
-
-//--- pay for apartment from wallet --//
-if (isset($_POST['drt']) && isset($_POST['all']) && isset($_POST['upl']) && isset($_POST['trpwod'])) {
-
-	$suite = clean($_POST['drt']);
-	$all   = clean($_POST['all']);
-	$upl   = clean($_POST['upl']);
-	$trps  = md5($_POST['trpwod']);
-
-	$tran = "DLAPT-".date("Y").rand(0, 99999999);
-
-	$r   = $_SESSION['Username'];
-	
-//retrieve user details
-$sql = "SELECT * FROM user WHERE `email` = '$r'";
-$res = query($sql);
-$row = mysqli_fetch_array($res);
-
-//confirm password for transction
-if ($row['pword'] != $trps) {
-	
-	echo "Invalid Password inputed";
-} else {
-
-$avlmt  = $row['wallet'];
-$tel    = $row['tel'];
-
-//get previous temporary wallet balance
-$temp   = $row['tempwallet'];
-
-//add new price plus previous temporary wallet bal
-if ($temp == "") {
-	$temp = 0;
-}
-
-$newtemp = $temp + $all;
-
-
-$date   = date('Y-m-d h:i:s');
-
-//set the expiry date for the user next rent
-$expy = date('Y-m-d', strtotime($date. ' + 1 year'));
-
-//check if user has enough funds
-if ($avlmt >= $all) {
-
-	rentapt($suite, $date, $r, $tel, $tran, $all, $upl, $expy, $newtemp, $avlmt);
-} else {
-
-	echo "You don`t have enough funds in your wallet.<br/> Kindly fund your wallet with an amount above NGN".number_format($all)." to rent this apartment.";
-
-}
-}
-}
-
-
-
-//get apartment
-function rentapt($suite, $date, $r, $tel, $tran, $all, $upl, $expy, $newtemp, $avlmt) {
-
-	//get apartment details from uploader
-	$rsl = "SELECT * FROM apartment WHERE `apt` = '$suite'";
-	$rss = query($rsl);
-	$rlw = mysqli_fetch_array($rss);
-
-	if ($upl == $r) {
-		
-		echo "This apartment belongs to you. <br/> You are not allowed to rent an apartment that belongs to you.";
+		echo 'Loading...Please Wait!';
+		echo '<script>window.location.href ="./pdf#latest"</script>';
 
 	} else {
 
-	//deduct available balance and credit tepmporary wallet
-	$walbal = $avlmt - $all;
-	$seqel  = "UPDATE user SET `tempwallet` = '$newtemp', `wallet` = '$walbal' WHERE `email` = '$r'";
-	$resl   = query($seqel);
+		//disapprove pdf
+		$ssl = "INSERT INTO pdf(`sn`, `inst`, `typ`, `title`, `code`, `fcg`, `dept`, `level`, `upld`, `dwnld`, `approve`, `earn`, `pedia`, `filer`)";
+		$ssl.= "VALUES('1', '$inst', '$typ', '$title', '$ccode', '$fcg', '$dept', '$level', '$upl', '0', 'No', '2', '$pedia', '$target_file')";
+		$result = query($ssl);
 
-	//insert details into transactions history
-	$sll = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$sll.= "VALUES('$tran', '$r', '$all', '$date', 'Apartment Rent', 'pending', 'wallet', 'debit')";
-	$rll = query($sll);
+		echo validator("Your PDF has been uploaded. A mail will be sent to you once your PDF is reviewed and approved.");
+		echo '<script>window.location.href ="./profile#upddate"</script>';
+	}
 
-
-	$pix = $rlw['pix'];
-	$tpl = $rlw['apartment'];
-
-	//give tenant a week to secure the apartment
-	$due        = date('D, M d, Y', strtotime($date. ' + 1 week'));
-
-	//insert user rent records
-	$sql = "INSERT INTO rent(`sn`, `apt`, `paydate`, `expiry`, `tenantmail`, `tenanttel`, `tranref`, `price`, `uploader`, `status`, `type` , `pix`, `pendlimit`)";
-	$sql.= " VALUES('1', '$suite', '$date', '$expy', '$r', '$tel', '$tran', '$all', '$upl', 'pending', '$tpl', '$pix', '$due')";
-	$result = query($sql);
-
-
-	//notify user about the new transaction on the dashboard
-	$ref = "DSPR-".rand(0, 99999); 
-	$msg = "Hi there, <br> you just rented an apartment.<br/>Kindly check your transaction history for details.<br/> Your rent will be due by <b>".date('D, M d, Y', strtotime($expy))."</b>";
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$r', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
-
-
-	//notify uploader of apartment about the new update
-	$ref2 = "DSPR-".rand(0, 99999); 
-	$msg2 = "Hi there, <br> your apartment with suite number <b>".$suite."</b> has been scheduled for rentage.<br/>Kindly check your apartment store for details.";
-	$sqln2 = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln2.= " VALUES('1', '$ref2', '$upl', '$msg2', '$date', 'unread')";
-	$resultn2 = query($sqln2);
-
-
-	//notify user via email
-	$to         = $r;
-	$from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "You rented an apartment";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./dashboard/./myapartments';
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>You rented an apartment</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> thank you for choosing DotLive as your apartment agency. <br/><br/> We noticed that you just rented an apartment. Below are <br/> details about the apartment rented ;</p>
-		<br/>";
-	$body .= '<table class="text-center" style="width:90%; margin-left: 45px; color: white; border: 1px solid #f9f9ff;">
-   <tr>
-    <th style="border: 1px solid #f9f9ff;">Suite</th>
-    <th style="border: 1px solid #f9f9ff;">Apartment</th>
-    <th style="border: 1px solid #f9f9ff;">Amount Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Date Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Next Due Date</th>
-    <th style="border: 1px solid #f9f9ff;">Mode of Payment</th>
-  </tr>
-  <tr style="border: 1px solid #f9f9ff;">
-    <td style="border: 1px solid #f9f9ff;">'.$suite.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tpl.'</td>
-    <td style="border: 1px solid #f9f9ff;">NGN '.number_format($all).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($date)).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($expy)).'</td>
-    <td style="border: 1px solid #f9f9ff;">wallet</td>
-  </tr>
-</table><br/>';
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #fbb710; text-decoration: none'>Kindly note that you are to verify this apartment and get your apartment key on or before  ".$due." <br/> else this apartment will no longer be yours. <br/><br/><span style='background: white; color: #ff0000; text-decoration: none;'> Click here to visit your apartment center</span> </a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-	$send = mail($to, $subject, $body, $headers);
-
-
-	//notify uploader via email
-	$to         = $upl;
-	$from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "Your Apartment was Rented";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./dashboard/./myapartments';
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>Your Apartment was Rented</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> thank you for choosing DotLive as your apartment agency. <br/><br/> One of your apartment has been rented. Below are <br/> details about the apartment rented ;</p>
-		<br/>";
-	$body .= '<table class="text-center" style="width:90%; margin-left: 45px; color: white; border: 1px solid #f9f9ff;">
-   <tr>
-    <th style="border: 1px solid #f9f9ff;">Suite</th>
-    <th style="border: 1px solid #f9f9ff;">Apartment</th>
-    <th style="border: 1px solid #f9f9ff;">Date Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Tenant Tel</th>
-  </tr>
-  <tr style="border: 1px solid #f9f9ff;">
-    <td style="border: 1px solid #f9f9ff;">'.$suite.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tpl.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($date)).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tel.'</td>
-  </tr>
-</table><br/>';
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #ff0000; text-decoration: none; background: white;'>Click here to review this rent</a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-	$send = mail($to, $subject, $body, $headers);
-
-
-	//update apartment to pending
-	$ssl = "UPDATE apartment SET `status` = 'pending' WHERE `apt` = '$suite'";
-	$rsl = query($ssl);
-
-
-	echo "Loading...Please wait!";												
-	echo '<script>window.location.href ="./success?id='.$tran.'&xp='.$expy.'"</script>';
-
-
+}
+}
+}
 }
 }
 
 
-
-
-
-
-
-
-//------------- pay for apartment from online wallet -----------//
-if (isset($_POST['onldrt']) && isset($_POST['onlall']) && isset($_POST['onlupl']) && isset($_POST['onltrpwod'])) {
-
-	$suite = clean($_POST['drt']);
-	$all   = clean($_POST['all']);
-	$upl   = clean($_POST['upl']);
-	$trps  = md5($_POST['trpwod']);
-
-	$tran = "DLAPT-".date("Y").rand(0, 99999999);
-
-	$r   = $_SESSION['Username'];
+/** UPLOAD PQ */
+function uploadpq() {
 	
-//retrieve user details
-$sql = "SELECT * FROM user WHERE `email` = '$r'";
-$res = query($sql);
-$row = mysqli_fetch_array($res);
 
-//confirm password for transction
-if ($row['pword'] != $trps) {
+	if(isset($_POST['pqupl'])) {
 	
-	echo "Invalid Password inputed";
-} else {
-
-$tel    = $row['tel'];
-
-//get previous temporary wallet balance
-$temp   = $row['tempwallet'];
-
-//add new price plus previous temporary wallet bal
-if ($temp == "") {
-	$temp = 0;
-}
-
-$newtemp = $temp + $all;
-
-
-$date   = date('Y-m-d h:i:s');
-
-//set the expiry date for the user next rent
-$expy = date('Y-m-d', strtotime($date. ' + 1 year'));
-
-
-	onlrentapt($suite, $date, $r, $tel, $tran, $all, $upl, $expy, $newtemp);
-}
-}
-
-
-
-//get apartment
-function onlrentapt($suite, $date, $r, $tel, $tran, $all, $upl, $expy, $newtemp) {
-
-	//get apartment details from uploader
-	$rsl = "SELECT * FROM apartment WHERE `apt` = '$suite'";
-	$rss = query($rsl);
-	$rlw = mysqli_fetch_array($rss);
-
-	if ($upl == $r) {
+		$inst 	= $_POST['inst'];
+		$typ 	= $_POST['typ'];
+		$title 	= $_POST['coursetitle'];
+		$ccode 	= $_POST['coursecode'];
+		$fcg	= $_POST['fcg'];
+		$dept   = $_POST['dept'];
+		$level  = $_POST['level'];
+	
+		$upl    = $_SESSION['login'];
+	
+		$pedia  = "pedia".rand(0, 9999);
+	
+		//check if the uploader is verified
+		$sql = "SELECT * FROM signup WHERE `usname` = '$upl'";
+		$rsl = query($sql);
+	
+		if(row_count($rsl) == '') {
+	
+			redirect("./signup");
+			
+		} else {
+	
+			$row = mysqli_fetch_array($rsl);
+			
+				$target_dir = "pqs/";
+				$target_file =  basename($_FILES["pdffile"]["name"]);
+				$targetFilePath = $target_dir . $target_file;
+				$uploadOk = 1;
+				$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+			
+				   
+				// Allow certain file formats
+				if($imageFileType != "pdf") {
+					echo validator("Sorry, only .pdf file format is allowed");
+					$uploadOk = 0;
+				} else {
+				// Check if $uploadOk is set to 0 by an error
+				if ($uploadOk == 0) {
+				   echo validator("Sorry, your file was not uploaded.");
+				// if everything is ok, try to upload file
+				} else {
+				   
+				   move_uploaded_file($_FILES["pdffile"]["tmp_name"], $targetFilePath);
 		
-		echo "This apartment belongs to you. <br/> You are not allowed to rent an apartment that belongs to you.";
-
-	} else {
-
-	//credit tepmporary wallet
-	$seqel  = "UPDATE user SET `tempwallet` = '$newtemp' WHERE `email` = '$r'";
-	$resl   = query($seqel);
-
-	//insert details into transactions history
-	$sll = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$sll.= "VALUES('$tran', '$r', '$all', '$date', 'Apartment Rent', 'pending', 'online pay', 'debit')";
-	$rll = query($sll);
-
-
-	$pix = $rlw['pix'];
-	$tpl = $rlw['apartment'];
-
-	//give tenant a week to secure the apartment
-	$due        = date('D, M d, Y', strtotime($date. ' + 1 week'));
-
-	//insert user rent records
-	$sql = "INSERT INTO rent(`sn`, `apt`, `paydate`, `expiry`, `tenantmail`, `tenanttel`, `tranref`, `price`, `uploader`, `status`, `type` , `pix`, `pendlimit`)";
-	$sql.= " VALUES('1', '$suite', '$date', '$expy', '$r', '$tel', '$tran', '$all', '$upl', 'pending', '$tpl', '$pix', '$due')";
-	$result = query($sql);
-
-
-	//notify user about the new transaction on the dashboard
-	$ref = "DSPR-".rand(0, 99999); 
-	$msg = "Hi there, <br> you just rented an apartment.<br/>Kindly check your transaction history for details.<br/> Your rent will be due by <b>".date('D, M d, Y', strtotime($expy))."</b>";
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$r', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
-
-
-	//notify uploader of apartment about the new update
-	$ref2 = "DSPR-".rand(0, 99999); 
-	$msg2 = "Hi there, <br> your apartment with suite number <b>".$suite."</b> has been scheduled for rentage.<br/>Kindly check your apartment store for details.";
-	$sqln2 = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln2.= " VALUES('1', '$ref2', '$upl', '$msg2', '$date', 'unread')";
-	$resultn2 = query($sqln2);
-
+		if($row['pvf'] == '1') {
+					
+			//approve PDF and upload details
+			$ssl = "INSERT INTO pq(`sn`, `inst`, `typ`, `title`, `code`, `fcg`, `dept`, `level`, `upld`, `dwnld`, `approve`, `earn`, `pedia`, `filer`)";
+			$ssl.= "VALUES('1', '$inst', '$typ', '$title', '$ccode', '$fcg', '$dept', '$level', '$upl', '0', 'Yes', '4', '$pedia', '$target_file')";
+			$result = query($ssl);
 	
-	//notify user via email
-	$to         = $r;
-	$from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "You rented an apartment";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./dashboard/./myapartments';
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>You rented an apartment</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> Thank you for choosing DotLive as your apartment agency. <br/><br/> We noticed that you just rented an apartment. Below are <br/> details about the apartment rented ;</p>
-		<br/>";
-	$body .= '<table class="text-center" style="width:90%; margin-left: 45px; color: white; border: 1px solid #f9f9ff;">
-   <tr>
-    <th style="border: 1px solid #f9f9ff;">Suite</th>
-    <th style="border: 1px solid #f9f9ff;">Apartment</th>
-    <th style="border: 1px solid #f9f9ff;">Amount Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Date Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Next Due Date</th>
-    <th style="border: 1px solid #f9f9ff;">Mode of Payment</th>
-  </tr>
-  <tr style="border: 1px solid #f9f9ff;">
-    <td style="border: 1px solid #f9f9ff;">'.$suite.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tpl.'</td>
-    <td style="border: 1px solid #f9f9ff;">NGN '.number_format($all).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($date)).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($expy)).'</td>
-    <td style="border: 1px solid #f9f9ff;">wallet</td>
-  </tr>
-</table><br/>';
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #fbb710; text-decoration: none'>Kindly note that you are to verify this apartment and get your apartment key on or before  ".$due." <br/> else this apartment will no longer be yours. <br/><br/><span style='color: #ff0000; text-decoration: none; background: white'> Click here to visit your apartment center</span></a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-	$send = mail($to, $subject, $body, $headers);
-
-
-	//notify uploader via email
-	$to         = $upl;
-	$from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "Your Apartment was Rented";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./dashboard/./myapartments';
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>Your Apartment was Rented</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> Thank you for choosing DotLive as your apartment agency. <br/><br/> One of your apartment has been rented. Below are <br/> details about the apartment rented ;</p>
-		<br/>";
-	$body .= '<table class="text-center" style="width:90%; margin-left: 45px; color: white; border: 1px solid #f9f9ff;">
-   <tr>
-    <th style="border: 1px solid #f9f9ff;">Suite</th>
-    <th style="border: 1px solid #f9f9ff;">Apartment</th>
-    <th style="border: 1px solid #f9f9ff;">Date Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Tenant Tel</th>
-  </tr>
-  <tr style="border: 1px solid #f9f9ff;">
-    <td style="border: 1px solid #f9f9ff;">'.$suite.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tpl.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($date)).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tel.'</td>
-  </tr>
-</table><br/>';
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #ff0000; text-decoration: none; background: white'>Click here to review this rent</a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-	$send = mail($to, $subject, $body, $headers);
-
-
-	//update apartment to pending
-	$ssl = "UPDATE apartment SET `status` = 'pending' WHERE `apt` = '$suite'";
-	$rsl = query($ssl);
-
-
-	echo "Loading...Please wait!";												
-	echo '<script>window.location.href ="./success?id='.$tran.'&xp='.$expy.'"</script>';
-
-
-}
-}
-
-
-function adsexpp() {
-//----universal check for ads expiry---//
-$sqller = "SELECT * FROM ads WHERE `session` = 'active'";
-$result = query($sqller);
-
-if (row_count($result) <= 0) {	
+			$_SESSION['pquploaded'] = "Your Past Questions was approved and uploaded successfully";
 	
-} else {
-while($row = mysqli_fetch_array($result)) {
-
-//check if ads is due for expiry
-$duration = date('Y-m-d', strtotime($row['date']));
-$expiry   = date('Y-m-d', strtotime($row['expiry']));
-
-$date     = date('Y-m-d');
-
-if ($date >= $expiry) {
-
-	//constants
-	$ads 	  = $row['ads_id'];
-	$tag      = $row['tagline'];
-	$username = $row['user'];
-	$prcn     = $row['price'];
-	$dap      = $row['date'];
+			echo 'Loading...Please Wait!';
+			echo '<script>window.location.href ="./pq#latest"</script>';
 	
-	$sqli = "UPDATE ads SET `session` = 'expired' WHERE `ads_id` = '$ads'";
-	$resi = query($sqli);
-
-	//notify user about the update
-	$ref = "DSPR-".rand(0, 99999);
-	$msg = "Hi there, <br> your ad(s) with Ads ID :- <b>$ads</b> and Ads Tagline - <b>$tag</b>  got expired. Kindly check your ads center for details.";
-
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$username', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
-
-
-	//notify user via email
-	$to         = $username;
-	$from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "Your Ad has expired";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./dashboard/./adscenter';
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>Your Ad has expired</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> one of your ad got expired and will no longer be active. <br/> Kindly check the table below for details; </p>
-		<br/>";
-	$body .= '<table class="text-center" style="width:90%; margin-left: 45px; color: white; border: 1px solid #f9f9ff;">
-   <tr>
-    <th style="border: 1px solid #f9f9ff;">Ads ID</th>
-    <th style="border: 1px solid #f9f9ff;">Tagline</th>
-    <th style="border: 1px solid #f9f9ff;">Amount Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Date Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Mode of Payment</th>
-  </tr>
-  <tr style="border: 1px solid #f9f9ff;">
-    <td style="border: 1px solid #f9f9ff;">'.$ads.'</td>
-    <td style="border: 1px solid #f9f9ff;">'.$tag.'</td>
-    <td style="border: 1px solid #f9f9ff;">NGN '.number_format($prcn).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($dap)).'</td>
-    <td style="border: 1px solid #f9f9ff;">wallet</td>
-  </tr>
-</table><br/>';
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #fbb710; text-decoration: none'>Click here to visit your ads center.</a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-	$send = mail($to, $subject, $body, $headers);
-
-}
-
-}
-
-}
-}
+		} else {
+	
+			//disapprove pdf
+			$ssl = "INSERT INTO pq(`sn`, `inst`, `typ`, `title`, `code`, `fcg`, `dept`, `level`, `upld`, `dwnld`, `approve`, `earn`, `pedia`, `filer`)";
+			$ssl.= "VALUES('1', '$inst', '$typ', '$title', '$ccode', '$fcg', '$dept', '$level', '$upl', '0', 'No', '4', '$pedia', '$target_file')";
+			$result = query($ssl);
+	
+			echo validator("Your Past Questions has been uploaded. A mail will be sent to you once your PDF is reviewed and approved.");
+			//echo '<script>window.location.href ="./profile"</script>';
+		}
+	
+	}
+	}
+	}
+	}
+	}
 
 
+/** TOTAL NUMBER OF PDF DOWNLOADED */
+function countpdld() {
 
-//universal apaerment expirty remainder
-function apt_exprem() {
-
-	//check for expired apartment
-	$sql = "SELECT * FROM rent WHERE `status` = 'rented'";
+	$sql = "SELECT sum(`dwnld`) AS totpdf FROM pdf";
 	$rsl = query($sql);
+	$row = mysqli_fetch_array($rsl);
 
-	if (row_count($rsl) <= 0) {	
-	
-	} else {
-	while($row = mysqli_fetch_array($rsl)) {
-	
-	//check if apartment is due for expiry
-	$expiry   = date('Y-m-d', strtotime($row['expiry']));
-	$date     = date('Y-m-d');
-	
-	$idid     = $row['apt'];
-	$price    = $row['price'];
-	$tmail    = $row['tenantmail'];
-	$lndlrd   = $row['uploader'];
+	$ssl = "SELECT sum(`dwnld`) AS totpq FROM pq";
+	$res = query($ssl);
+	$rwl = mysqli_fetch_array($res);
 
-	$datep    = $row['paydate'];
-	
-
-	
-	
-	if ($date >= $expiry) {	
-
-	//set apartment to active
-	$sls = "UPDATE apartment SET `status` = 'available' WHERE `apt` = '$idid'";
-	$fdr = query($sls);
-	
-	//delete apatment
-	$ssk = "DELETE FROM rent WHERE `apt` = '$idid'";
-	$rsk = query($ssk);
-
-	//notify user about the update
-	$ref = "DSPR-".rand(0, 99999);
-	$msg = "Hi there, <br> your rented apartment with Suite_No :- <b>$idid</b> has expired. Kindly check your Apartment Tab for details.";
-
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$tmail', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
-	
-	
-	//notify lanlord about the update
-	$refl = "DSPR-".rand(0, 99999);
-	$msgl = "Hi there, <br> your apartment with Suite_No :- <b>$idid</b> is now available for rent. Kindly check your Apartment Tab for details.";
-
-	$sqlnl = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqlnl.= " VALUES('1', '$ref', '$lndlrd', '$msg', '$date', 'unread')";
-	$resultnl = query($sqlnl);
-
-
-	//notify user via email
-	$to         = $tmail;
-	$from 		= "noreply@dotlive.com.ng";
-    $cmessage 	= "Best Regards<br/> <i>Team DotLive</i>";
-
-	$headers  = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $from . "\r\n";
-	$headers .= "MIME-Version: 1.0\r\n";
-    $headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-    $headers .= "X-Priority: 1 (Highest)\n";
-    $headers .= "X-MSMail-Priority: High\n";
-    $headers .= "Importance: High\n";
-
-    $subject = "Your Rented Apartment Has Expired";
-
-    $logo = 'https://dotlive.com.ng/assets/img/logo/2.png';
-    $url  = 'https://dotlive.com.ng';
-    $link = 'https://dotlive.com.ng/./dashboard/./myapartments';
-
-	$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotlive.com.ng/assets/css/bootstrap.min.css'><body style='text-align: center;'>";
-	$body .= "<section style='margin: 30px; margin-top: 50px ; background: #000000; color: white;'>";
-	$body .= "<img style='margin-top: 35px' src='{$logo}' alt='DotLive'>";
-	$body .= "<h1 style='margin-top: 45px; color: #fbb710'>Your Rented Apartment Has Expired</h1>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> Your rented apartment has expired. Below are <br/> details about the apartment expired ;</p>
-		<br/>";
-	$body .= '<table class="text-center" style="width:90%; margin-left: 45px; color: white; border: 1px solid #f9f9ff;">
-   <tr>
-    <th style="border: 1px solid #f9f9ff;">Suite</th>
-    <th style="border: 1px solid #f9f9ff;">Amount Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Date Paid</th>
-    <th style="border: 1px solid #f9f9ff;">Due Date</th>
-  </tr>
-  <tr style="border: 1px solid #f9f9ff;">
-    <td style="border: 1px solid #f9f9ff;">'.$ididi.'</td>
-    <td style="border: 1px solid #f9f9ff;">NGN '.number_format($price).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($datep)).'</td>
-    <td style="border: 1px solid #f9f9ff;">'.date('D, M d, Y', strtotime($expy)).'</td>
-  </tr>
-</table><br/>';
-	$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='background: white; color: #ff0000; text-decoration: none;'> Click here to visit your apartment center</span> </a></p>
-		<br/>";
-	$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this email. This is a virtual email</p>";	
-    $body .= "<p text-align: center;'><a href='https://doteightplus.com/contact'><img src='https://dotlive.com.ng/assets/img/icon/5.png'></a>";
-    $body .= "<p style='text-align: center;'>Email.: <span style='color: #fbb710'>support@dotlive.com.ng</span></p>";	
-	$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #fbb710'>+234(0) 810 317 1902</span></p>";	
-	$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotLive from DotEightPlus</p>";	
-	$body .= "<script src='https://dotlive.com.ng/assets/js/bootstrap.min.js'></script>";
-	$body .= "</section>";	
-	$body .= "</body></html>";
-	$send = mail($to, $subject, $body, $headers);
-	}
-}
-}
+	echo $a = $row['totpdf'] + $rwl['totpq'];
 }
 
+/** TOTAL PDFs UPLOADED */
+function countupl() {
 
-//-- universal check for apartment expiry --//
-function apt_exp() {
-
-	//check for expired pending apartment
-	$sql = "SELECT * FROM rent WHERE `status` = 'pending'";
+	$sql = "SELECT sum(`sn`) AS totpdf FROM pdf WHERE `approve` = 'Yes'";
 	$rsl = query($sql);
+	$row = mysqli_fetch_array($rsl);
 
-	if (row_count($rsl) <= 0) {	
-	
-	} else {
-	while($row = mysqli_fetch_array($rsl)) {
-	
-	//check if apartment is due for expiry
-	$expiry   = date('Y-m-d', strtotime($row['pendlimit']));
-	$date     = date('Y-m-d');
-	$idid     = $row['apt'];
-	$price    = $row['price'];
-	$tmail    = $row['tenantmail'];
-	$lndlrd   = $row['uploader'];
-	
-	if ($date >= $expiry) {
+	$ssl = "SELECT sum(`sn`) AS totpq FROM pq WHERE `approve` = 'Yes'";
+	$res = query($ssl);
+	$rwl = mysqli_fetch_array($res);
 
-	//retrieve user record
-	$userl = "SELECT * FROM user WHERE `email` = '$tmail'";
-	$rrr   = query($userl);
-
-	$rww   = mysqli_fetch_array($rrr);
-
-
-	//sum up prices to wallet balance
-	$prc  = $rww['wallet'] + $price;
-	
-
-	//if yes, set apartment to active
-	$ssl = "UPDATE apartment SET `status` = 'available' WHERE `apt` = '$idid'";
-	$frl = query($ssl);
-	
-	//credit the user and update ledger balance
-	$upd = "UPDATE user SET `wallet` = '$prc', `tempwallet` = 0 WHERE `email` = '$tmail'";
-	$updl = query($upd);
-
-	//insert details into transactions history
-	$tran = "DLAPT-".rand(0, 99999);
-
-	$sll = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$sll.= "VALUES('$tran', '$tmail', '$price', '$date', 'Rent Reversal', 'Reversed', 'Automated', 'Credit')";
-	$rll = query($sll);
-
-	//notify user about the update
-	$ref = "DSPR-".rand(0, 99999);
-	$msg = "Hi there, <br> your rented apartment with Suite_No :- <b>$idid</b> was reversed due to a pending verification limit which has expired. Kindly check your Transaction History for details.";
-
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$tmail', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
-	
-	
-	//notify lanlord about the update
-	$refl = "DSPR-".rand(0, 99999);
-	$msgl = "Hi there, <br> your apartment with Suite_No :- <b>$idid</b> was reversed due to a pending verification limit which has expired. Kindly check your Apartment Tab for details.";
-
-	$sqlnl = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqlnl.= " VALUES('1', '$ref', '$lndlrd', '$msg', '$date', 'unread')";
-	$resultnl = query($sqlnl);
-	}
-}
-	}
+	echo $a = $row['totpdf'] + $rwl['totpq'];
 }
 
 
+/** COUNT USERS */
+function countusers() {
 
-
-//verify apartent in love
-if(isset($_POST['love']) && isset($_POST['lvpr']) && isset($_POST['uprl'])){
-
-	$aptlove = $_POST['love'];
-	$aptpr   = $_POST['lvpr'];
-	$uplr    = $_POST['uprl'];
-
-	$date     = date("y-m-d");
-	$username = $_SESSION['Username'];
-	$ref      = "DSPR-".rand(0, 99999);
-
-	$msg      = "Hi there, <br> your apartment with Suite_No :- <b>$aptlove</b> has been rented. Kindly check your Apartment and Transaction History Tab for details.";
-
-	//get user previous ledger balance and deduct new balnc
-	$lrd = "SELECT * FROM user WHERE `email` = '$username'";
-	$sqw = query($lrd);
-	$dwe = mysqli_fetch_array($sqw);
-
-	if($dwe['tempwallet'] == 0) {
-
-		$tempbal = 0;
-	} else {
-
-	$tempbal = $dwe['tempwallet'] - $aptpr;
-	}
-
-	//get uploader previous waller balance and add up
-	$red  = "SELECT * FROM user WHERE `email` = '$uplr'";
-	$reds = query($red);
-	$tre  = mysqli_fetch_array($reds);
-
-	$tres = $tre['wallet'] + $aptpr;
-
-	//update rent detials
-	$sql 	 = "UPDATE rent SET `status` = 'rented' WHERE `apt` = '$aptlove'";
-	$rrr     = query($sql);
-
-	//update apartment details
-	$ssl    = "UPDATE apartment SET `status` = 'rented' WHERE `apt` = '$aptlove'";
-	$rsl    = query($ssl);
-
-
-	//credit agent or landlord
-	$frde   = "UPDATE user SET `wallet` = '$tres' WHERE `email` = '$uplr'";
-	$dds    = query($frde);
-
-	//insert wallet hsitory
-	$tran = "DLAPT-".rand(0, 99999);
-
-	$slml = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$slml.= "VALUES('$tran', '$uplr', '$tres', '$date', 'Rent Paid', 'Paid', 'Automated', 'Credit')";
-	$rlml = query($slml);
+	$sql = "SELECT sum(`id`) as totuser FROM signup WHERE `active` = '1'";
+	$rsl = query($sql);
+	$row = mysqli_fetch_array($rsl);
 	
-
-	//deduct the user ledger bal
-	$sdr = "UPDATE user SET `tempwallet` = '$tempbal' WHERE `email` = '$username'";
-	$fdd = query($sdr);
-
-	//update wallet history
-	$tran = "DLAPT-".rand(0, 99999);
-
-	$slml = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$slml.= "VALUES('$tran', '$username', '$tempbal', '$date', 'Rent Paid', 'Paid', 'Ledger Balance', 'Debit')";
-	$rlml = query($slml);
-
-	//notify landlord
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$uplr', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
-
-	echo '<script>window.location.href ="./myapartments"</script>';
-
+	echo $row['totuser'];
 }
 
 
+/** EARNINGS MADE */
+function earning() {
+                      
+	//add earn from pdf upload
+	$stl = "SELECT sum(sn) AS total, sum(earn) AS earning FROM pdf WHERE `approve` = 'Yes'";
+	$rtl = query($stl); 
+	$rtw = mysqli_fetch_array($rtl);
 
+	//add earn from past questions uploads
+	$swl = "SELECT sum(sn) AS pqtotal, sum(earn) AS pqearning FROM pq WHERE `approve` = 'Yes'";
+	$rwl = query($swl); 
+	$rww = mysqli_fetch_array($rwl);
 
-//verify apartment via unlike
-
-if(isset($_POST['loverd']) && isset($_POST['lvprd']) && isset($_POST['uprld'])){
-
-	$aptlove = $_POST['loverd'];
-	$aptpr   = $_POST['lvprd'];
-	$uplr    = $_POST['uprld'];
-
-	$date     = date("y-m-d");
-	$username = $_SESSION['Username'];
-	$ref      = "DSPR-".rand(0, 99999);
-
-	$msg      = "Hi there, <br> your apartment with Suite_No :- <b>$aptlove</b> is available for rent. Kindly check your Apartment Tab for details.";
-
-	//get user previous ledger balance and add new balnc
-	$lrd = "SELECT * FROM user WHERE `email` = '$username'";
-	$sqw = query($lrd);
-	$dwe = mysqli_fetch_array($sqw);
-
-	if($dwe['tempwallet'] == 0) {
-
-		$tempbal = 0;
-	} else {
-
-	$tempbal = $dwe['tempwallet'] - $aptpr;
-
-	}
-
-	$avalbt  = $dwe['wallet'] + $aptpr;
-
-	//delete rent detials
-	$sql 	 = "DELETE FROM rent WHERE `apt` = '$aptlove'";
-	$rrr     = query($sql);
-
-	//update apartment details
-	$ssl    = "UPDATE apartment SET `status` = 'available' WHERE `apt` = '$aptlove'";
-	$rsl    = query($ssl);
-
-
-	//credit user wallet and update ledger balance
-	$frde   = "UPDATE user SET `wallet` = '$avalbt' WHERE `email` = '$username'";
-	$dds    = query($frde);
-
-	$dfs   = "UPDATE user SET `tempwallet` = '$tempbal' WHERE `email` = '$username'";
-	$gfr   = query($dfs);
-
-	//insert wallet hsitory
-	$tran = "DLAPT-".rand(0, 99999);
-
-	$slml = "INSERT INTO wallet_his(`transref`, `user`, `amt`, `date`, `details`, `status`, `mode`, `type`)";
-	$slml.= "VALUES('$tran', '$username', '$aptpr', '$date', 'Rent Reversal', 'Reversed', 'Ledger Balance', 'Credit')";
-	$rlml = query($slml);
+   
+	//get total referrals
+	$raf = "SELECT sum(id) AS reftotal FROM signup";
+	$ras = query($raf);
 	
 
-	//notify landlord
-	$sqln = "INSERT INTO support_reply(`sn`, `ref`, `usname`, `msg`, `date`, `status`)";
-	$sqln.= " VALUES('1', '$ref', '$uplr', '$msg', '$date', 'unread')";
-	$resultn = query($sqln);
+	if(row_count($ras) == '') {
+		
+		$refff = 0;
+	} else {
 
-	echo '<script>window.location.href ="./myapartments"</script>';
+		$rao    = mysqli_fetch_array($ras);
+		$refff  = number_format($rao['reftotal']);                             
+
+	}
+	
+	
+	$a = $rtw['earning'] + $rww['pqearning'] + $refff;
+	echo $a;
 }
 ?>

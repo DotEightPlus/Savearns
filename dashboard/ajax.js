@@ -11,22 +11,22 @@ $(document).ready(function () {
     var ref = $("#ref").val();
 
     if (fname == "" || fname == null) {
-      $("#fmsg").html("Kindly input your full name.");
+      $("#msg").html("Kindly input your full name.");
     } else {
       if (tel == "" || tel == null) {
-        $("#tmsg").html("Telephone number cannot be empty");
+        $("#msg").html("Telephone number cannot be empty");
       } else {
         if (email == "" || email == null) {
-          $("#emsg").html("Invalid email address");
+          $("#msg").html("Invalid email address");
         } else {
            if (user == "" || user == null) {
-              $("#usmsg").html("Create a username");
+              $("#msg").html("Create a username");
             } else {
               if (pword == "" || pword == null) {
-                $("#pwmsg").html("Create a secured password");
+                $("#msg").html("Create a secured password");
               } else {
                 if (cpword == "" || cpword == null) {
-                  $("#cpmsg").html("Confirm your password");
+                  $("#msg").html("Confirm your password");
                 } else {
                   if (pword != cpword) {
                     $("#msg").html("Password does not match");
