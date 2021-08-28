@@ -284,6 +284,7 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 		$user = $row['usname'];
 
 		$_SESSION['usname'] = $user;
+		unset($_SESSION['usemail']);
 		
 		echo 'Loading...Please Wait';
 		echo '<script>window.location.href ="./"</script>';
@@ -298,23 +299,31 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 			$username        = clean(escape($_POST['username']));
 			$password   	 = md5($_POST['password']);
 
-			$sql = "SELECT * FROM `signup` WHERE `usname` = '$username' AND `pword` = '$password'";
+			$sql = "SELECT * FROM `users` WHERE `usname` = '$username' AND `pword` = '$password'";
 			$result = query($sql);
 			if(row_count($result) == 1) {
 
-				$row 	= mysqli_fetch_array($result);
-				$user 	= $row['usname'];
-				$active = $row['active'];
-				$email 	= $row['email'];
+				$row 	    = mysqli_fetch_array($result);
+				
+				$user 		= $row['usname'];
+				$active 	= $row['active'];
+				$email 		= $row['email'];
+				$activator 	= $row['activator'];
 
-				if ($active == 0) {
+				if ($active == 0 || $activator != '') {
 
-					$activator = token_generator();
+					$newotp = otp();
 
 					$_SESSION['usemail'] = $email;
 
+					mail_mailer($email, $activator, $subj);
+
+					//open otp page
+					echo 'Loading...Please Wait!';
+					echo '<script>otpVerify(); signupClose();</script>';
+
 					//update activation link
-					$ups = "UPDATE signup SET `activator` = '$activator' WHERE `usname` = '$username'";
+					$ups = "UPDATE users SET `activator` = '$newotp' WHERE `usname` = '$username'";
 					$ues = query($ups);
 
 					//redirect to verify function
