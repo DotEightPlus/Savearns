@@ -159,7 +159,7 @@ if(isset($_SESSION['login'])) {
                                         aria-describedby="otp-addon" onfocus="otpr()">
 
                                     <input type="text" id="otpmail" class="form-control"
-                                        value="<?php echo $_SESSION['usemail'] ?>">
+                                        value="<?php echo $_SESSION['usemail'] ?>" hidden>
                                 </div>
 
 
@@ -167,8 +167,9 @@ if(isset($_SESSION['login'])) {
                                     <p class="text-danger" id="vmsg"></p>
                                     <button type="button" id="vsub" class="btn bg-gradient-dark w-100 my-4 mb-2">Verify
                                         Account</button>
-                                    <p class="text-sm mt-3 mb-0 text-center"> <a href="#" id="rotp"
-                                            class="text-dark font-weight-bolder">Resend OTP</a></p>
+                                    <p style="cursor: pointer"
+                                        class="text-sm mt-3 mb-0 text-center text-dark font-weight-bolder" id="rotp">
+                                        Resend OTP</p>
                                 </div>
 
                             </form>

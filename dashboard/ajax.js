@@ -83,6 +83,32 @@ $("#rotp").click(function () {
 })
 
 
+//verify otp
+$("#vsub").click(function () {
+
+  var vemail = $("#otpmail").val();
+  var votp   = $("#otpper").val();
+
+  if (email == "" || email == null) {
+    $("#vmsg").html("Server Error!");
+  } else {
+    if (votp == "" || votp == null) {
+      $("#vmsg").html("Invalid OTP!");
+    } else {
+    $("#vmsg").html("Loading... Please Wait");
+    $.ajax({
+      type: "post",
+      url: "functions/init.php",
+      data: {vemail:vemail, votp: votp},
+      success: function (data) {
+        $("#vmsg").html(data);
+      },
+    });
+  }
+  }
+})
+
+
   //signin
   $("#signin").click(function () {
     var username = $("#lgusr").val();

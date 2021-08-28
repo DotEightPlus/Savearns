@@ -215,7 +215,7 @@ $body .= "<h1 style='margin-top: 45px; color: #fff'>Activate your email to conti
 $body .= "<h3 style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br /><br />
 Kindly use the otp below to activate your account;</h3>
 <br />";
-$body .= "<h2 style='margin-left: 45px; text-align: left;'><b>{$activator}</b></h2>
+$body .= "<h2 style='margin-left: 45px; text-align: center;'><b>{$activator}</b></h2>
 <br />";
 $body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this
 email. This is a virtual email</p>";
@@ -244,11 +244,50 @@ if(isset($_POST['email']) && isset($_POST['otpp'])) {
 	$sql = "UPDATE users SET `activator` = '$activator'  WHERE `email` = '$email'";
 	$res = query($sql);
 
-	$subj = "VERIFY YOUR EMAIL";
+	$subj = "VERIFY YOUR EMAIL";	
 
 	mail_mailer($email, $activator, $subj);
 }
 
+
+/**Activate OTP ACCOUNT */
+if(isset($_POST['vemail']) && isset($_POST['votp'])) {
+
+	$email = clean(escape($_POST['vemail']));
+	$veotp = clean(escape($_POST['veotp']));
+
+	$otp   = $_SESSION['otp'];
+
+	//select otp from db and confirm with session
+	if($veotp != $otp) {
+
+		echo "Invalid OTP Code!";
+		
+	} else {
+
+	//update database and login
+	$sql = "UPDATE users SET `activator` = '', `active` = '1' WHERE `email` = '$email'";
+	$res = query($sql);
+
+	//get username and redirect to dashboard
+	$ssl = "SELECT * FROM users WHERE `email` =  '$email'";
+	$rsl = query($ssl);
+	if(row_count($rsl) == '') {
+		
+		echo 'Loading...Please Wait';
+		echo '<script>window.location.href ="./signin"</script>';
+		
+	} else {
+
+		$row  = mysqli_fetch_array($rsl);
+		$user = $_SESSION['usname'] = $row['usname'];
+		
+		echo 'Loading...Please Wait';
+		echo '<script>window.location.href ="./signup"</script>';
+	}
+	}
+
+}
 
 /** SIGN IN USER **/
  	if(isset($_POST['username']) && isset($_POST['password'])) {
@@ -772,4 +811,5 @@ function earning() {
 	$a = $rtw['earning'] + $rww['pqearning'] + $refff;
 	echo $a;
 }
+?>
 ?>

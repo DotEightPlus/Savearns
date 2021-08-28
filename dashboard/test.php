@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 $to = $email;
 $from = "noreply@savearns.com";
@@ -34,7 +35,7 @@ $body = "
         $body .= "<h3 style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br /><br />
             Kindly use the otp below to activate your account;</h3>
         <br />";
-        $body .= "<h2 style='margin-left: 45px; text-align: left;'><b>{$activator} 7473473</b></h2>
+        $body .= "<h2 style='margin-left: 45px; text-align: center;'><b>{$activator} 7473473</b></h2>
         <br />";
         $body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Do not bother replying this
             email. This is a virtual email</p>";
@@ -51,6 +52,6 @@ $body = "
     $body .= "</body>
 
 </html>";
-echo $body;
+echo $_SESSION['otp'];
 
 ?>
