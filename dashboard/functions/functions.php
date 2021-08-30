@@ -166,10 +166,11 @@ $result = query($sql);
 
 //redirect to verify function
 $subj = "VERIFY YOUR EMAIL";
+$msg  = "Hi there! <br /><br />Kindly use the otp below to activate your account;";
 
 $_SESSION['usemail'] = $email;
 
-mail_mailer($email, $activator, $subj);
+mail_mailer($email, $activator, $subj, $msg);
 
 //open otp page
 echo 'Loading...Please Wait!';
@@ -179,7 +180,7 @@ echo'<script>otpVerify(); signupClose();</script>';
 
 
 /* MAIL VERIFICATIONS */
-function mail_mailer($email, $activator, $subj) {
+function mail_mailer($email, $activator, $subj, $msg) {
 
 $to = $email;
 $from = "noreply@savearns.com";
@@ -210,10 +211,9 @@ $body = "
 <body style='text-align: center;'>";
 $body .= "<section style='margin: 30px; margin-top: 50px ; background: #34459C; color: #fff;'>";
 $body .= "<img style='margin-top: 35px; width: 460px; height: 105px;' src='{$logo}' alt='Savearns'>";
-$body .= "<h1 style='margin-top: 45px; color: #fff'>Activate your email to continue</h1>
+$body .= "<h1 style='margin-top: 45px; color: #fff'>{$subj}</h1>
 <br />";
-$body .= "<h3 style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br /><br />
-Kindly use the otp below to activate your account;</h3>
+$body .= "<h3 style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>{$msg}</h3>
 <br />";
 $body .= "<h2 style='margin-left: 45px; text-align: center;'><b>{$activator}</b></h2>
 <br />";
@@ -244,9 +244,10 @@ if(isset($_POST['email']) && isset($_POST['otpp'])) {
 	$sql = "UPDATE users SET `activator` = '$activator'  WHERE `email` = '$email'";
 	$res = query($sql);
 
-	$subj = "VERIFY YOUR EMAIL";	
+	$subj = "VERIFY YOUR EMAIL";
+	$msg  = "Hi there! <br /><br />Kindly use the otp below to activate your account;";	
 
-	mail_mailer($email, $activator, $subj);
+	mail_mailer($email, $activator, $subj, $msg);
 	echo "New OTP Code sent to your email";
 }
 
@@ -276,7 +277,7 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 	if(row_count($rsl) == '') {
 		
 		echo 'Loading...Please Wait';
-		//echo '<script>window.location.href ="./signin"</script>';
+		echo '<script>window.location.href ="./signin"</script>';
 		
 	} else {
 
@@ -287,7 +288,13 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 		unset($_SESSION['usemail']);
 		
 		echo 'Loading...Please Wait';
-		echo '<script>window.location.href ="./"</script>';
+
+		if(!isset($_SESSION['vnext'])) {
+		//echo '<script>window.location.href ="./"</script>';
+		} else {
+			$data = $_SESSION['vnext'];
+			echo '<script>'.$data.'</script>';
+		}
 	}
 	}
 
@@ -321,8 +328,9 @@ if(isset($_POST['vemail']) && isset($_POST['votp'])) {
 					$ues = query($ups);
 
 					$subj = "VERIFY YOUR EMAIL";
+					$msg  = "Hi there! <br /><br />Kindly use the otp below to activate your account;";
 
-					mail_mailer($email, $activator, $subj);
+					mail_mailer($email, $activator, $subj, $msg);
 
 					//open otp page
 					echo 'Loading...Please Wait!';
@@ -361,69 +369,29 @@ if(isset($_POST['fgeml'])) {
 
 	if(!email_exist($email)) {
 
-		echo "Sorry! This email doesn't exit";
+		echo "Sorry! This email doesn't have an account";
 		
 	} else {
 
-	$activator = token_generator();
+	$activator = otp();
 
-	$ssl = "UPDATE signup SET `activator` = '$activator' WHERE `email` = '$email'";
+	$ssl = "UPDATE users SET `activator` = '$activator' WHERE `email` = '$email'";
 	$rsl = query($ssl);
 
 	//redirect to verify function
 	$subj = "RESET YOUR PASSWORD";
-	$link = "https://dotpedia.com.ng/./reset?vef=".$activator;
+	$msg  = "Hi there! <br /><br />Kindly use the otp below to restore your password;";
 
 	$_SESSION['fgeml'] = $email;
 
-	fgmail_mailer($email, $activator, $subj, $link);
+	mail_mailer($email, $activator, $subj, $msg);
 
-	//redirect to verify page
+	//open otp page
 	echo 'Loading...Please Wait!';
-	echo '<script>window.location.href ="./recover"</script>';
+	$_SESSION['vnext'] = "updatePword();";
+	echo '<script>otpVerify(); signupClose();</script>';
 
 	}
-}
-
-
-/** FORGOT PASSWORD EMAIL **/
-function fgmail_mailer($email, $activator, $subj, $link) {
-	
-$to 		= $email;
-$from 		= "noreply@dotpedia.com.ng";
-$cmessage 	= "Best Regards<br/> <i>Team DotPedia</i>";
-
-$headers  = "From: " . $from . "\r\n";
-$headers .= "Reply-To: ". $from . "\r\n";
-$headers .= "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-$headers .= "X-Priority: 1 (Highest)\n";
-$headers .= "X-MSMail-Priority: High\n";
-$headers .= "Importance: High\n";
-
-$subject = $subj;
-
-$logo = 'https://dotpedia.com.ng/images/cover.png';
-$url  = 'https://dotpedia.com.ng';
-
-$body = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><title>DotLive from DotEightPlus</title></head><link rel='stylesheet' href='https://dotpedia.com.ng/css/bootstrap.min.css'><body style='text-align: center;'>";
-$body .= "<section style='margin: 30px; margin-top: 50px ; background: #FFE9E6; color: #000;'>";
-$body .= "<img style='margin-top: 35px; width: 280px; height: 105px;' src='{$logo}' alt='DotPedia'>";
-$body .= "<h1 style='margin-top: 45px; color: #ff0000'>Recover Your Password</h1>
-<br/>";
-$body .= "<p style='margin-left: 45px; margin-top: 34px; text-align: left; font-size: 17px;'>Hi there! <br/> You requested for a password reset</p><br/>";
-
-$body .= "<p style='margin-left: 45px; text-align: left;'><a target='_blank' href='{$link}' style='color: #ff0000; text-decoration: none'><b>Click here to recover your password</b></a></p>
-<br/>";
-$body .= "<p style='margin-left: 45px; padding-bottom: 80px; text-align: left;'>Kindly ignore this mail if this wasn't from you.</p>";	
-$body .= "<p text-align: center;'><a href='https://dotpedia.com.ng/contact'><img src='https://dotpedia.com.ng/images/6.png'></a>";
-$body .= "<p style='text-align: center;'>Email.: <span style='color: #ff0000'>pdf@dotpedia.com.ng</span></p>";	
-$body .= "<p style='text-align: center;'>Call/Chat.: <span style='color: #ff0000'>+234(0) 810 317 1902</span></p>";	
-$body .= "<p style='text-align: center; padding-bottom: 50px;'>DotPedia from DotEightPlus</p>";	
-$body .= "<script src='https://dotpedia.com.ng/js/bootstrap.min.js'></script>";
-$body .= "</section>";	
-$body .= "</body></html>";
-$send = mail($to, $subject, $body, $headers);
 }
 
 

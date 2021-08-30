@@ -76,25 +76,21 @@ if(isset($_SESSION['login'])) {
                         <div class="card-body">
                             <form role="form text-left">
                                 <div class="row">
-                                    <div class="mb-3 col-lg-6">
-                                        <label>Username</label>
-                                        <input type="text" id="luname" class="form-control" placeholder="Input Username"
-                                            onfocus="usr()">
+                                    <div class="mb-3 col-lg-12">
+                                        <label>Email</label>
+                                        <input type="email" id="femail" class="form-control"
+                                            placeholder="Input your email" onfocus="fmail()">
                                     </div>
-                                    <div class="mb-3 col-lg-6">
-                                        <label>Password</label>
-                                        <input type="password" id="lpword" class="form-control"
-                                            placeholder="Input your Password" onfocus="prr()">
-                                    </div>
+
                                 </div>
 
                                 <div class="text-center">
-                                    <p class="text-danger" id="lmsg"></p>
-                                    <button type="button" id="lsub" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign
-                                        In</button>
+                                    <p class="text-danger" id="fmsg"></p>
+                                    <button type="button" id="fsub" class="btn bg-gradient-dark w-100 my-4 mb-2">Restore
+                                        Password</button>
                                 </div>
-                                <h5 class="text-sm mt-3 mb-0 text-center"><a href="./forgot"
-                                        class="text-dark font-weight-bolder">Forgot password</a>
+                                <h5 class="text-sm mt-3 mb-0 text-center"><a href="./signin"
+                                        class="text-dark font-weight-bolder">My Dashboard</a>
                                     &nbsp;|&nbsp;
                                     <a href="./signup" class="text-dark font-weight-bolder">Create a free account</a>
                                 </h5>
@@ -121,7 +117,7 @@ if(isset($_SESSION['login'])) {
                                         aria-describedby="otp-addon" onclick="otpr()">
 
                                     <input type="email" id="otpmail" class="form-control"
-                                        value="<?php echo $_SESSION['usemail'] ?>" hidden>
+                                        value="<?php echo $_SESSION['fgeml'] ?>" hidden>
                                 </div>
 
 
@@ -161,12 +157,8 @@ if(isset($_SESSION['login'])) {
     }
 
     //erase validations
-    function usr() {
-        document.getElementById("lmsg").innerHTML = '';
-    }
-
-    function prr() {
-        document.getElementById("lmsg").innerHTML = '';
+    function fmail() {
+        document.getElementById("fmsg").innerHTML = '';
     }
 
     function otpr() {

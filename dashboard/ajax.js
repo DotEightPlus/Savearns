@@ -140,25 +140,23 @@ $("#vsub").click(function () {
   });
 
   //forgot
-  $("#forgot").click(function () {
-    var fgeml = $("#fgeml").val();
+  $("#fsub").click(function () {
+    var fgeml = $("#femail").val();
 
     if (fgeml == "" || fgeml == null) {
-      $("#msg").html("Please insert your email");
+      $("#fmsg").html("Please insert your email");
     } else {
-      $("#msg").html("Loading...Please Wait!");
+      $("#fmsg").html("Loading...Please Wait!");
 
       $.ajax({
         type: "post",
         url: "functions/init.php",
         data: { fgeml: fgeml },
         success: function (data) {
-          $("#msg").html(data);
+          $("#fmsg").html(data);
         },
       });
     }
-
-    $("#exampleModalCenter").modal();
   });
 
   //reset
