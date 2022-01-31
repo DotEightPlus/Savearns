@@ -74,27 +74,8 @@
 			<h3 class="l1-txt2 txt-center respon1">
 				Co<span style="color: red;">mi</span>ng S<span style="color: #34459C;">oo</span>n
 			</h3>
-			<div class="flex-c-m row cd100 p-t-30 p-b-15">
-				<div class="flex-col-c-m flex-b m-r-22 m-t-8 m-b-8">
-					<span class="l1-txt1 wsize1 hours">17</span>
-					<span class="m1-txt1 p-b-2">Days</span>
-				</div>
-
-			  <div class="flex-col-c-m flex-b m-r-22 m-t-8 m-b-8">
-					<span class="l1-txt1 wsize1 hours">17</span>
-					<span class="m1-txt1 p-b-2">Hr</span>
-				</div>
-
-				<div class="flex-col-c-m flex-b m-r-22 m-t-8 m-b-8">
-					<span class="l1-txt1 wsize1 minutes">50</span>
-					<span class="m1-txt1 p-b-2">Min</span>
-				</div>
-
-				<div class="flex-col-c-m flex-b m-r-22 m-t-8 m-b-8">
-					<span class="l1-txt1 wsize1 seconds">39</span>
-					<span class="m1-txt1 p-b-2">Sec</span>
-				</div>
-			</div>
+			
+			<h1 class="mt-5 mb-5 font900 text-white" id="demo"></h1>
 			<div class="m-t-10 m-b-10">
 				<a target="_blank" href="https://twitter.com/savearns" class="size2 s1-txt1 flex-c-m how-btn1 trans-04">
 					Click here to Win Some Gifts
@@ -130,6 +111,36 @@
 	<script src="vendor/countdowntime/moment-timezone-with-data.min.js"></script>
 	<script src="vendor/countdowntime/countdowntime.js"></script>
 	<script>
+		// Set the date we're counting down to
+		var countDownDate = new Date("Feb 01, 2022 20:00:00").getTime();
+		
+		// Update the count down every 1 second
+		var x = setInterval(function() {
+		
+		  // Get today's date and time
+		  var now = new Date().getTime();
+			
+		  // Find the distance between now and the count down date
+		  var distance = countDownDate - now;
+			
+		  // Time calculations for days, hours, minutes and seconds
+		  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+		  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+		  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+			
+		  // Output the result in an element with id="demo"
+		  document.getElementById("demo").innerHTML = days + "d " + hours + "h "
+		  + minutes + "m " + seconds + "s ";
+			
+		  // If the count down is over, write some text 
+		  if (distance < 0) {
+			clearInterval(x);
+			document.getElementById("demo").innerHTML = "EXPIRED";
+		  }
+		}, 1000);
+		</script>
+	<!---<script>
 		$('.cd100').countdown100({
 			/*Set Endtime here*/
 			/*Endtime must be > current time*/
@@ -143,7 +154,7 @@
 			// ex:  timeZone: "America/New_York"
 			//go to " http://momentjs.com/timezone/ " to get timezone
 		});
-	</script>
+	</script>-->
 <!--===============================================================================================-->
 	<script src="vendor/tilt/tilt.jquery.min.js"></script>
 	<script >
